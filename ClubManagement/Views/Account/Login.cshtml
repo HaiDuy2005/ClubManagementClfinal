@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Đăng nhập quản trị";
+}
+<div class="login-stage">
+    <aside class="login-art-panel">
+        <div class="login-art-top"><img class="club-logo club-logo-login" src="~/images/logo.svg" asp-append-version="true" alt="Logo CLB Văn nghệ" width="44" height="44" /><span>CLB VĂN NGHỆ / ADMIN</span></div>
+        <div class="login-art-copy"><span class="section-kicker">BEHIND THE SCENES</span><h1>Mọi sân khấu đều cần người <em>đứng sau.</em></h1><p>Quản lý thành viên, hoạt động và những điều làm nên cộng đồng sáng tạo.</p></div>
+        <div class="login-art-bottom"><span>CREATIVITY IN MOTION</span><span>✳ 01—03</span></div>
+    </aside>
+    <section class="login-form-panel">
+        <div class="login-form-heading"><span class="login-form-kicker">CHÀO MỪNG TRỞ LẠI</span><h2>Đăng nhập<span>.</span></h2><p>Đăng nhập để tiếp tục quản lý CLB Văn Nghệ.</p></div>
+        <form method="post" class="login-form">
+            <div class="mb-4"><label class="form-label" for="username">Tài khoản quản trị</label><input id="username" type="text" name="username" class="form-control" placeholder="Nhập tên tài khoản" autocomplete="username" required /></div>
+            <div class="mb-3"><label class="form-label" for="password">Mật khẩu</label><input id="password" type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="current-password" required /></div>
+            @if (ViewBag.Error != null) { <div class="alert alert-danger" role="alert">@ViewBag.Error</div> }
+            <button type="submit" class="btn btn-login-submit">Vào khu vực quản trị <span aria-hidden="true">↗</span></button>
+            <a asp-controller="Home" asp-action="Index" class="login-back-link">← Quay lại trang chủ</a>
+        </form>
+        <div class="login-form-foot"><span>TRUY CẬP DÀNH RIÊNG CHO QUẢN TRỊ VIÊN</span><img class="club-logo club-logo-small" src="~/images/logo.svg" asp-append-version="true" alt="Logo CLB Văn nghệ" width="30" height="30" /></div>
+    </section>
+</div>

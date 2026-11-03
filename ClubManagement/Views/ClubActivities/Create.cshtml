@@ -1,0 +1,57 @@
+@model ClubManagement.Models.ClubActivity
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Thêm hoạt động";
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Thêm hoạt động</h1>
+        <p class="text-muted">Tạo một hoạt động hoặc chương trình mới cho câu lạc bộ.</p>
+    </header>
+
+    <div class="record-card">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-grid">
+                <div class="field span-2">
+                    <label asp-for="ActivityName" class="form-label">Tên hoạt động</label>
+                    <input asp-for="ActivityName" class="form-control" placeholder="Ví dụ: Đêm nhạc chào tân sinh viên" />
+                    <span asp-validation-for="ActivityName" class="text-danger"></span>
+                </div>
+                <div class="field span-2">
+                    <label asp-for="Description" class="form-label">Mô tả</label>
+                    <textarea asp-for="Description" rows="4" class="form-control" placeholder="Nội dung, yêu cầu tham gia..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Location" class="form-label">Địa điểm</label>
+                    <input asp-for="Location" class="form-control" placeholder="Ví dụ: Hội trường A" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="ActivityDate" class="form-label">Ngày tổ chức</label>
+                    <input asp-for="ActivityDate" class="form-control" />
+                    <span asp-validation-for="ActivityDate" class="text-danger"></span>
+                </div>
+                <div class="field span-2">
+                    <label asp-for="ClubId" class="form-label">Câu lạc bộ</label>
+                    <select asp-for="ClubId" asp-items="(IEnumerable<SelectListItem>)ViewBag.Clubs" class="form-select"></select>
+                    <span asp-validation-for="ClubId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">Lưu hoạt động</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

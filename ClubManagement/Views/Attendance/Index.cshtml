@@ -1,0 +1,396 @@
+@model IEnumerable<ClubManagement.Models.ActivityAttendance>
+
+@{
+    ViewData["Title"] = "Quản lý điểm danh";
+
+    var activityNames =
+        ViewBag.ActivityNames as IDictionary<int, string>
+        ?? new Dictionary<int, string>();
+
+    var searchName = ViewBag.SearchName as string ?? "";
+    var searchStudentCode = ViewBag.SearchStudentCode as string ?? "";
+    var searchActivity = ViewBag.SearchActivity as string ?? "";
+    var searchDate = ViewBag.SearchDate as string ?? "";
+    var searchStatus = ViewBag.SearchStatus as string ?? "All";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <a asp-controller="Account"
+           asp-action="Dashboard"
+           class="btn btn-outline-secondary mb-3">
+             Quay lại quản trị
+        </a>
+
+        <h1 class="fw-bold">Quản lý điểm danh</h1>
+
+        <p class="text-secondary">
+            Tìm kiếm, kiểm tra minh chứng và xử lý yêu cầu điểm danh.
+        </p>
+    </div>
+
+    @if (TempData["AttendanceSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["AttendanceSuccess"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["AttendanceError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["AttendanceError"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+            <h5 class="fw-bold mb-3">Tìm kiếm điểm danh</h5>
+
+            <form asp-controller="Attendance"
+                  asp-action="Index"
+                  method="get">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6 col-lg-4">
+                        <label for="searchName" class="form-label">
+                            Họ tên sinh viên
+                        </label>
+
+                        <input type="text"
+                               id="searchName"
+                               name="searchName"
+                               value="@searchName"
+                               class="form-control"
+                               placeholder="Nhập họ tên..." />
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <label for="searchStudentCode" class="form-label">
+                            Mã sinh viên
+                        </label>
+
+                        <input type="text"
+                               id="searchStudentCode"
+                               name="searchStudentCode"
+                               value="@searchStudentCode"
+                               class="form-control"
+                               placeholder="Nhập mã sinh viên..." />
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <label for="searchActivity" class="form-label">
+                            Tên hoạt động
+                        </label>
+
+                        <input type="text"
+                               id="searchActivity"
+                               name="searchActivity"
+                               value="@searchActivity"
+                               class="form-control"
+                               placeholder="Nhập tên hoạt động..." />
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <label for="searchDate" class="form-label">
+                            Ngày điểm danh
+                        </label>
+
+                        <input type="date"
+                               id="searchDate"
+                               name="searchDate"
+                               value="@searchDate"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <label for="searchStatus" class="form-label">
+                            Trạng thái
+                        </label>
+
+                        <select id="searchStatus"
+                                name="searchStatus"
+                                class="form-select">
+
+                            <option value="All"
+                                    selected="@(searchStatus == "All")">
+                                Tất cả trạng thái
+                            </option>
+
+                            <option value="Pending"
+                                    selected="@(searchStatus == "Pending")">
+                                Chờ duyệt
+                            </option>
+
+                            <option value="Approved"
+                                    selected="@(searchStatus == "Approved")">
+                                Đã duyệt
+                            </option>
+
+                            <option value="Rejected"
+                                    selected="@(searchStatus == "Rejected")">
+                                Từ chối
+                            </option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+
+                    <button type="submit" class="btn btn-primary">
+                         Tìm kiếm
+                    </button>
+
+                    <a asp-controller="Attendance"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Xóa bộ lọc
+                    </a>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">
+                    Danh sách yêu cầu điểm danh
+                </h5>
+
+                <span class="badge bg-light text-dark">
+                    @(Model?.Count() ?? 0) yêu cầu
+                </span>
+            </div>
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sinh viên</th>
+                                <th>Mã sinh viên</th>
+                                <th>Lớp</th>
+                                <th>Hoạt động</th>
+                                <th>Ngày</th>
+                                <th>Minh chứng</th>
+                                <th>Trạng thái</th>
+                                <th>Điểm</th>
+                                <th style="min-width:280px">Xử lý</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                var activityName =
+                                    activityNames.TryGetValue(
+                                        item.ActivityId,
+                                        out var name)
+                                        ? name
+                                        : $"Hoạt động #{item.ActivityId}";
+
+                                <tr>
+
+                                    <td class="fw-semibold">
+                                        @item.FullName
+                                    </td>
+
+                                    <td>
+                                        @item.StudentCode
+                                    </td>
+
+                                    <td>
+                                        @item.ClassName
+                                    </td>
+
+                                    <td>
+                                        @activityName
+                                    </td>
+
+                                    <td>
+                                        @item.AttendanceDate.ToString("dd/MM/yyyy")
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(item.EvidenceObjectKey))
+                                        {
+                                            <a asp-controller="Attendance"
+                                               asp-action="Evidence"
+                                               asp-route-id="@item.AttendanceId"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               class="btn btn-sm btn-outline-primary">
+                                                Xem ảnh
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary">
+                                                Chưa có ảnh
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Chờ duyệt
+                                            </span>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success">
+                                                Đã duyệt
+                                            </span>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <span class="badge bg-danger">
+                                                Từ chối
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @item.Status
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td class="fw-bold">
+                                        @item.TrainingPoints
+                                    </td>
+
+                                    <td>
+
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <div class="d-flex flex-column gap-2">
+
+                                                <!-- DUYỆT -->
+                                                <form asp-controller="Attendance"
+                                                      asp-action="Approve"
+                                                      method="post">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@item.AttendanceId" />
+
+                                                    <input type="hidden"
+                                                           name="trainingPoints"
+                                                           value="1" />
+
+                                                    <input type="text"
+                                                           name="adminNote"
+                                                           class="form-control form-control-sm mb-2"
+                                                           placeholder="Ghi chú (nếu có)" />
+
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-success"
+                                                            onclick="return confirm('Xác nhận duyệt điểm danh và cộng 1 điểm rèn luyện?');">
+                                                        ✓ Duyệt
+                                                    </button>
+
+                                                </form>
+
+                                                <!-- TỪ CHỐI -->
+                                                <form asp-controller="Attendance"
+                                                      asp-action="Reject"
+                                                      method="post">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@item.AttendanceId" />
+
+                                                    <input type="text"
+                                                           name="adminNote"
+                                                           class="form-control form-control-sm mb-2"
+                                                           placeholder="Lý do từ chối"
+                                                           required />
+
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-danger"
+                                                            onclick="return confirm('Bạn có chắc muốn từ chối yêu cầu này?');">
+                                                        ✕ Từ chối
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="small">
+                                                <strong>Ghi chú:</strong>
+
+                                                @(string.IsNullOrWhiteSpace(item.AdminNote)
+                                                    ? "Không có"
+                                                    : item.AdminNote)
+                                            </div>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+
+                    <div class="fs-1">🔎</div>
+
+                    <h5 class="mt-3">
+                        Không tìm thấy yêu cầu điểm danh
+                    </h5>
+
+                    <p class="text-secondary">
+                        Thử thay đổi điều kiện tìm kiếm hoặc xóa bộ lọc.
+                    </p>
+
+                    <a asp-controller="Attendance"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        Xem tất cả yêu cầu
+                    </a>
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

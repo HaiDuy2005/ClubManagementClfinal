@@ -1,0 +1,37 @@
+@model ClubManagement.Models.Member
+
+@{
+    ViewData["Title"] = "Chi tiết thành viên";
+    var initial = string.IsNullOrWhiteSpace(Model.FullName) ? "?" : Model.FullName.Trim().Substring(0, 1).ToUpper();
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Chi tiết thành viên</h1>
+        <p class="text-muted">Thông tin hồ sơ của thành viên trong câu lạc bộ.</p>
+    </header>
+
+    <div class="record-card">
+        <div class="detail-hero">
+            <span class="detail-avatar">@initial</span>
+            <div>
+                <h2>@Model.FullName</h2>
+                <span class="badge bg-primary">@Model.Position</span>
+            </div>
+        </div>
+        <dl class="detail-grid">
+            <div class="detail-item"><dt>Mã sinh viên</dt><dd>@Model.StudentCode</dd></div>
+            <div class="detail-item"><dt>Lớp</dt><dd>@Model.ClassName</dd></div>
+            <div class="detail-item"><dt>Email</dt><dd>@Model.Email</dd></div>
+            <div class="detail-item"><dt>Số điện thoại</dt><dd>@Model.Phone</dd></div>
+            <div class="detail-item"><dt>Điểm rèn luyện</dt><dd>@Model.TrainingPoints</dd></div>
+            <div class="detail-item"><dt>Mã câu lạc bộ</dt><dd>@Model.ClubId</dd></div>
+        </dl>
+        <div class="form-actions">
+            <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-warning">Sửa thông tin</a>
+            <a asp-action="Delete" asp-route-id="@Model.MemberId" class="btn btn-danger">Xóa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,191 @@
+
+@model IEnumerable<ClubManagement.Models.Contact>
+
+@{
+    ViewData["Title"] = "Danh Sách Liên Hệ";
+
+    var searchName = ViewBag.SearchName as string ?? "";
+    var searchEmail = ViewBag.SearchEmail as string ?? "";
+    var searchMessage = ViewBag.SearchMessage as string ?? "";
+    var searchDate = ViewBag.SearchDate as string ?? "";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="mb-3">
+        <a asp-controller="Account"
+           asp-action="Dashboard"
+           class="btn btn-outline-secondary">
+            Quay lại quản trị
+        </a>
+    </div>
+
+    <div class="mb-4">
+        <h1>Danh Sách Liên Hệ</h1>
+        <p class="text-muted">
+            Tra cứu nội dung liên hệ được gửi đến CLB Văn Nghệ.
+        </p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h5 class="mb-3">Tìm kiếm liên hệ</h5>
+
+            <form asp-controller="Contact"
+                  asp-action="AdminList"
+                  method="get">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Tên người gửi</label>
+                        <input type="text"
+                               name="searchName"
+                               value="@searchName"
+                               class="form-control"
+                               placeholder="Nhập tên người gửi..." />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="text"
+                               name="searchEmail"
+                               value="@searchEmail"
+                               class="form-control"
+                               placeholder="Nhập email..." />
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label">Nội dung tin nhắn</label>
+                        <input type="text"
+                               name="searchMessage"
+                               value="@searchMessage"
+                               class="form-control"
+                               placeholder="Nhập từ khóa trong tin nhắn..." />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Ngày gửi</label>
+                        <input type="date"
+                               name="searchDate"
+                               value="@searchDate"
+                               class="form-control" />
+                    </div>
+
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        Tìm kiếm
+                    </button>
+
+                    <a asp-controller="Contact"
+                       asp-action="AdminList"
+                       class="btn btn-outline-secondary">
+                        Làm mới
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Kết quả tìm kiếm</h5>
+
+        <span class="badge bg-primary">
+            @Model.Count() liên hệ
+        </span>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover shadow-sm">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Người gửi</th>
+                    <th>Email</th>
+                    <th>Nội dung</th>
+                    <th>Ngày gửi</th>
+                    <th class="text-center" style="width: 120px;">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Email</td>
+
+                            <td style="min-width: 250px; white-space: pre-wrap;">
+                                @item.Message
+                            </td>
+
+                            <td>
+                                @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+
+                            <td class="text-center">
+                                <form asp-controller="Contact"
+                                      asp-action="Delete"
+                                      asp-route-id="@item.ContactId"
+                                      method="post"
+                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa liên hệ của @item.Name không?');">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm">
+                                        Xóa
+                                    </button>
+
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <p class="fw-bold mb-1">
+                                Không tìm thấy liên hệ
+                            </p>
+
+                            <span class="text-muted">
+                                Hãy thử thay đổi từ khóa hoặc ngày gửi.
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+</div>

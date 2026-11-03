@@ -1,0 +1,32 @@
+@model ClubManagement.Models.ClubActivity
+
+@{
+    ViewData["Title"] = "Chi tiết hoạt động";
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Chi tiết hoạt động</h1>
+        <p class="text-muted">Thông tin chương trình của câu lạc bộ.</p>
+    </header>
+
+    <div class="record-card">
+        <div class="detail-hero">
+            <span class="detail-avatar">@Model.ActivityDate.ToString("dd")</span>
+            <div><h2>@Model.ActivityName</h2><span class="badge bg-secondary">@Model.ActivityDate.ToString("dd/MM/yyyy")</span></div>
+        </div>
+        <dl class="detail-grid">
+            <div class="detail-item span-2"><dt>Mô tả</dt><dd>@(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)</dd></div>
+            <div class="detail-item"><dt>Địa điểm</dt><dd>@Model.Location</dd></div>
+            <div class="detail-item"><dt>Ngày tổ chức</dt><dd>@Model.ActivityDate.ToString("dd/MM/yyyy HH:mm")</dd></div>
+            <div class="detail-item"><dt>Mã câu lạc bộ</dt><dd>@Model.ClubId</dd></div>
+        </dl>
+        <div class="form-actions">
+            <a asp-action="Edit" asp-route-id="@Model.ActivityId" class="btn btn-warning">Sửa thông tin</a>
+            <a asp-action="Participants" asp-route-id="@Model.ActivityId" class="btn btn-info">Sinh viên tham gia</a>
+            <a asp-action="Delete" asp-route-id="@Model.ActivityId" class="btn btn-danger">Xóa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </div>
+</div>

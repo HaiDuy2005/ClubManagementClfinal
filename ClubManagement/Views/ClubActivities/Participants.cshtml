@@ -1,0 +1,36 @@
+@model IEnumerable<ClubManagement.Models.ActivityRegistration>
+
+@{
+    ViewData["Title"] = "Sinh viên tham gia";
+}
+
+<div class="record-page wide">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Danh sách sinh viên tham gia</h1>
+        <p class="text-muted">Những sinh viên đã được duyệt tham gia hoạt động này.</p>
+    </header>
+
+    <div class="record-card">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Họ tên</th><th>MSSV</th><th>Lớp</th><th>Email</th></tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr><td>@item.FullName</td><td>@item.StudentCode</td><td>@item.ClassName</td><td>@item.Email</td></tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="4" class="text-center py-4 text-muted">Chưa có sinh viên nào được duyệt tham gia.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

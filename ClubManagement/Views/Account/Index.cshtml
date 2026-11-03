@@ -1,0 +1,90 @@
+
+@model IEnumerable<ClubManagement.Models.ActivityAttendance>
+
+@{
+ ViewData["Title"] = "Quản lý điểm danh";
+ var activityNames =
+ ViewBag.ActivityNames as IDictionary<int, string>;
+}
+
+<div class="container mt-4 mb-5">
+ <div class="card shadow-sm">
+ <div class="card-header bg-primary text-white">
+ <h3 class="mb-0"> Quản lý điểm danh hoạt động</h3>
+ </div>
+
+ <div class="card-body">
+ <p>Danh sách sinh viên gửi yêu cầu điểm danh.</p>
+
+ <div class="table-responsive">
+ <table class="table table-bordered table-hover align-middle">
+ <thead class="table-dark">
+ <tr>
+ <th>Họ tên</th>
+ <th>Mã sinh viên</th>
+ <th>Hoạt động</th>
+ <th>Ngày tham gia</th>
+ <th>Trạng thái</th>
+ <th>Điểm rèn luyện</th>
+ </tr>
+ </thead>
+ <tbody>
+ @if (Model != null && Model.Any())
+ {
+ foreach (var item in Model)
+ {
+ <tr>
+ <td>@item.FullName</td>
+ <td>@item.StudentCode</td>
+ <td>
+ @{
+ var name = "Không xác định";
+ if (activityNames != null &&
+ activityNames.ContainsKey(item.ActivityId))
+ {
+ name = activityNames[item.ActivityId];
+ }
+ }
+ @name
+ </td>
+ <td>
+ @item.AttendanceDate.ToString("dd/MM/yyyy")
+ </td>
+ <td>
+ @if (item.Status == "Approved")
+ {
+ <span class="badge bg-success">Đã duyệt</span>
+ }
+ else if (item.Status == "Rejected")
+ {
+ <span class="badge bg-danger">Từ chối</span>
+ }
+ else
+ {
+ <span class="badge bg-warning text-dark">Chờ duyệt</span>
+ }
+ </td>
+ <td>@item.TrainingPoints</td>
+ </tr>
+ }
+ }
+ else
+ {
+ <tr>
+ <td colspan="6" class="text-center">
+ Chưa có sinh viên gửi yêu cầu điểm danh.
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+
+ <a asp-controller="Admin"
+ asp-action="Index"
+ class="btn btn-secondary">
+ Quay lại trang Admin
+ </a>
+ </div>
+ </div>
+</div>

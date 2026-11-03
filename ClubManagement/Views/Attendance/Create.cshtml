@@ -1,0 +1,116 @@
+@model ClubManagement.Models.ActivityAttendance
+
+@{
+    ViewData["Title"] = "Điểm danh hoạt động";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 750px;">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Điểm danh hoạt động</h3>
+        </div>
+
+        <div class="card-body">
+            <p class="text-secondary">
+                Điền thông tin tham gia và gửi ảnh minh chứng để ban quản trị xác nhận.
+            </p>
+
+            @if (TempData["AttendanceSuccess"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["AttendanceSuccess"]
+                </div>
+            }
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"
+                 role="alert"></div>
+
+            <form asp-controller="Attendance"
+                  asp-action="Create"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label">
+                        Họ và tên sinh viên
+                    </label>
+                    <input asp-for="FullName"
+                           class="form-control"
+                           placeholder="Nhập họ và tên" />
+                    <span asp-validation-for="FullName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="StudentCode" class="form-label">
+                        Mã số sinh viên
+                    </label>
+                    <input asp-for="StudentCode"
+                           class="form-control"
+                           placeholder="Nhập mã số sinh viên" />
+                    <span asp-validation-for="StudentCode"
+                          class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="ClassName" class="form-label">Lớp</label>
+                    <input asp-for="ClassName" class="form-control"
+                           placeholder="Ví dụ: 242101TH001" />
+                    <span asp-validation-for="ClassName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ActivityId" class="form-label">
+                        Hoạt động tham gia
+                    </label>
+                    <select asp-for="ActivityId"
+                            asp-items="ViewBag.Activities"
+                            class="form-select">
+                        <option value="">-- Chọn hoạt động --</option>
+                    </select>
+                    <span asp-validation-for="ActivityId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="attendanceDate">
+                        Ngày tham gia
+                    </label>
+                    <input type="date"
+                           id="attendanceDate"
+                           name="attendanceDate"
+                           class="form-control"
+                           value="@DateTime.Now.ToString("yyyy-MM-dd")"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="evidenceFile">
+                        Ảnh minh chứng
+                    </label>
+                    <input type="file"
+                           id="evidenceFile"
+                           name="evidenceFile"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                           required />
+                    <div class="form-text">
+                        Chỉ chấp nhận ảnh JPG, JPEG hoặc WEBP, dung lượng tối đa 5 MB.
+                    </div>
+                    <span class="text-danger" data-valmsg-for="evidenceFile"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Gửi yêu cầu điểm danh
+                </button>
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="btn btn-secondary ms-2">
+                    Quay lại
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,79 @@
+@model ClubManagement.Models.Contact
+
+@{
+ ViewData["Title"] = "Liên Hệ";
+}
+<div class="back-navigation">
+    <button type="button" class="btn-back" onclick="goBack()">
+        <span aria-hidden="true">←</span>
+        Quay lại
+    </button>
+</div>
+
+<script>
+    function goBack() {
+        if (document.referrer &&
+            new URL(document.referrer).origin === window.location.origin) {
+            window.history.back();
+        } else {
+            window.location.href = '@Url.Action("Index", "Home")';
+        }
+    }
+</script>
+
+<div class="card shadow p-4">
+
+ <h2> Liên Hệ CLB Văn Nghệ</h2>
+
+ <hr />
+
+ <h5>Thông tin liên hệ</h5>
+
+ <p> SĐT: 0901234567</p>
+ <p> Zalo: https://zalo.me/clbvannghe</p>
+ <p> Facebook: https://facebook.com/clbvannghe</p>
+
+ <hr />
+
+ @if (TempData["Success"] != null)
+ {
+ <div class="alert alert-success">
+ @TempData["Success"]
+ </div>
+ }
+
+ <form asp-action="Create">
+
+ <div class="mb-3">
+ <label>Họ tên</label>
+ <input asp-for="Name" class="form-control" />
+ </div>
+
+ <div class="mb-3">
+ <label>Email</label>
+ <input asp-for="Email" class="form-control" />
+ </div>
+
+ <div class="mb-3">
+ <label>Nội dung</label>
+ <textarea asp-for="Message"
+ class="form-control"
+ rows="5"></textarea>
+ </div>
+
+ <div class="form-check mb-3">
+ <input asp-for="IsAnonymous"
+ class="form-check-input" />
+
+ <label class="form-check-label">
+ Gửi ẩn danh
+ </label>
+ </div>
+
+ <button class="btn btn-primary">
+ Gửi liên hệ
+ </button>
+
+ </form>
+
+</div>

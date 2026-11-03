@@ -1,0 +1,79 @@
+@model ClubManagement.Models.Member
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Thêm thành viên";
+    var positions = new List<string> { "Chủ nhiệm", "Phó chủ nhiệm", "Ban truyền thông", "Ban văn nghệ", "Thành viên" };
+    if (!string.IsNullOrWhiteSpace(Model.Position) && !positions.Contains(Model.Position)) { positions.Insert(0, Model.Position); }
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Thêm thành viên</h1>
+        <p class="text-muted">Nhập thông tin thành viên mới của CLB Văn Nghệ.</p>
+    </header>
+
+    <div class="record-card">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-grid">
+                <div class="field span-2">
+                    <label asp-for="FullName" class="form-label">Họ và tên</label>
+                    <input asp-for="FullName" class="form-control" placeholder="Ví dụ: Nguyễn Văn An" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="StudentCode" class="form-label">Mã sinh viên</label>
+                    <input asp-for="StudentCode" class="form-control" placeholder="Ví dụ: 2421001" />
+                    <span asp-validation-for="StudentCode" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="ClassName" class="form-label">Lớp</label>
+                    <input asp-for="ClassName" class="form-control" placeholder="Ví dụ: 242101TH001" />
+                    <span asp-validation-for="ClassName" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" class="form-control" placeholder="ten@example.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Phone" class="form-label">Số điện thoại</label>
+                    <input asp-for="Phone" class="form-control" placeholder="Ví dụ: 0901234567" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Position" class="form-label">Chức vụ</label>
+                    <select asp-for="Position" class="form-select">
+                        @foreach (var p in positions)
+                        {
+                            <option value="@p" selected="@(p == Model.Position)">@p</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Position" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="TrainingPoints" class="form-label">Điểm rèn luyện</label>
+                    <input asp-for="TrainingPoints" type="number" min="0" class="form-control" />
+                    <span asp-validation-for="TrainingPoints" class="text-danger"></span>
+                </div>
+                <div class="field span-2">
+                    <label asp-for="ClubId" class="form-label">Câu lạc bộ</label>
+                    <select asp-for="ClubId" asp-items="(IEnumerable<SelectListItem>)ViewBag.Clubs" class="form-select"></select>
+                    <span asp-validation-for="ClubId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">Lưu thành viên</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

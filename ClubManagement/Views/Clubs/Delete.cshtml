@@ -1,0 +1,31 @@
+@model ClubManagement.Models.Club
+
+@{
+    ViewData["Title"] = "Xóa câu lạc bộ";
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Xóa câu lạc bộ</h1>
+        <p class="text-muted">Hành động này không thể hoàn tác.</p>
+    </header>
+
+    <div class="record-card danger-card">
+        <div class="danger-note"><span class="danger-mark" aria-hidden="true">!</span><p>Bạn có chắc chắn muốn xóa câu lạc bộ <strong>@Model?.ClubName</strong> không?</p></div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @if (Model != null)
+        {
+            <dl class="detail-grid">
+                <div class="detail-item"><dt>Tên câu lạc bộ</dt><dd>@Model.ClubName</dd></div>
+                <div class="detail-item"><dt>Ngày thành lập</dt><dd>@Model.CreatedDate.ToString("dd/MM/yyyy")</dd></div>
+                <div class="detail-item span-2"><dt>Mô tả</dt><dd>@(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)</dd></div>
+            </dl>
+            <form asp-action="Delete" asp-route-id="@Model.ClubId" method="post" class="form-actions">
+                <input type="hidden" name="id" value="@Model.ClubId" />
+                <button type="submit" class="btn btn-danger btn-solid">Xác nhận xóa</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </form>
+        }
+    </div>
+</div>

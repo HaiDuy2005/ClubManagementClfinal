@@ -1,0 +1,46 @@
+@model ClubManagement.Models.Club
+
+@{
+    ViewData["Title"] = "Thêm câu lạc bộ";
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Thêm câu lạc bộ</h1>
+        <p class="text-muted">Tạo mới một câu lạc bộ để quản lý thành viên và hoạt động.</p>
+    </header>
+
+    <div class="record-card">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-grid">
+                <div class="field span-2">
+                    <label asp-for="ClubName" class="form-label">Tên câu lạc bộ</label>
+                    <input asp-for="ClubName" class="form-control" placeholder="Ví dụ: CLB Văn Nghệ" />
+                    <span asp-validation-for="ClubName" class="text-danger"></span>
+                </div>
+                <div class="field span-2">
+                    <label asp-for="Description" class="form-label">Mô tả</label>
+                    <textarea asp-for="Description" rows="4" class="form-control" placeholder="Giới thiệu ngắn về câu lạc bộ"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="CreatedDate" class="form-label">Ngày thành lập</label>
+                    <input asp-for="CreatedDate" class="form-control" />
+                    <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">Lưu câu lạc bộ</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

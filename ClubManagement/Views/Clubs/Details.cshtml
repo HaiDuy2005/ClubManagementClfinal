@@ -1,0 +1,29 @@
+@model ClubManagement.Models.Club
+
+@{
+    ViewData["Title"] = "Chi tiết câu lạc bộ";
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Chi tiết câu lạc bộ</h1>
+        <p class="text-muted">Thông tin chung của câu lạc bộ.</p>
+    </header>
+
+    <div class="record-card">
+        <div class="detail-hero">
+            <span class="detail-avatar">@(string.IsNullOrWhiteSpace(Model.ClubName) ? "?" : Model.ClubName.Trim().Substring(0, 1).ToUpper())</span>
+            <div><h2>@Model.ClubName</h2></div>
+        </div>
+        <dl class="detail-grid">
+            <div class="detail-item span-2"><dt>Mô tả</dt><dd>@(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)</dd></div>
+            <div class="detail-item"><dt>Ngày thành lập</dt><dd>@Model.CreatedDate.ToString("dd/MM/yyyy")</dd></div>
+        </dl>
+        <div class="form-actions">
+            <a asp-action="Edit" asp-route-id="@Model.ClubId" class="btn btn-warning">Sửa thông tin</a>
+            <a asp-action="Delete" asp-route-id="@Model.ClubId" class="btn btn-danger">Xóa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </div>
+</div>

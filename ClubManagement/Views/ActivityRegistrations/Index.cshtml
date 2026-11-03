@@ -1,0 +1,49 @@
+@model IEnumerable<ClubManagement.Models.ActivityRegistration>
+
+@{
+ ViewData["Title"] = "Danh sách đăng ký hoạt động";
+}
+
+<h2> Danh sách đăng ký hoạt động</h2>
+
+<table class="table table-bordered">
+ <thead>
+ <tr>
+ <th>Họ tên</th>
+ <th>MSSV</th>
+ <th>Lớp</th>
+ <th>Hoạt động</th>
+ <th>Ngày tổ chức</th>
+ <th>Trạng thái</th>
+ <th>Thao tác</th>
+ </tr>
+ </thead>
+
+ <tbody>
+ @foreach (var item in Model)
+ {
+ <tr>
+ <td>@item.FullName</td>
+ <td>@item.StudentCode</td>
+ <td>@item.ClassName</td>
+ <td>@item.ActivityName</td>
+ <td>@item.ActivityDate.ToString("dd/MM/yyyy")</td>
+
+ <td>
+ @(item.IsApproved ? "Đã duyệt" : "Chờ duyệt")
+ </td>
+
+ <td>
+ @if (!item.IsApproved)
+ {
+ <a asp-action="Approve"
+ asp-route-id="@item.RegistrationId"
+ class="btn btn-success">
+ Duyệt
+ </a>
+ }
+ </td>
+ </tr>
+ }
+ </tbody>
+</table>

@@ -1,0 +1,52 @@
+@model IEnumerable<ClubManagement.Models.ClubActivity>
+
+<div class="card shadow p-4">
+
+ <h1 class="text-primary mb-4">
+ Hoạt Động CLB
+ </h1>
+
+ <div class="row">
+
+ @foreach(var item in Model)
+ {
+ <div class="col-md-6 mb-4">
+
+ <div class="card shadow h-100">
+
+ <div class="card-body">
+
+ <h4>
+ @item.ActivityName
+ </h4>
+
+ <p>
+ @item.Description
+ </p>
+
+ <p>
+ @item.Location
+ </p>
+
+ <p>
+ @item.ActivityDate.ToString("dd/MM/yyyy")
+ </p>
+<a asp-controller="ActivityRegistration"
+ asp-action="Create"
+ asp-route-id="@item.ActivityId"
+ class="btn btn-success">
+
+ Đăng Ký Tham Gia
+
+ </a>
+
+ </div>
+
+ </div>
+
+ </div>
+ }
+
+ </div>
+
+</div>

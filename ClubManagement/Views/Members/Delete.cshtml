@@ -1,0 +1,32 @@
+@model ClubManagement.Models.Member
+
+@{
+    ViewData["Title"] = "Xóa thành viên";
+}
+
+<div class="record-page">
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+    <header class="record-head">
+        <h1>Xóa thành viên</h1>
+        <p class="text-muted">Hành động này không thể hoàn tác.</p>
+    </header>
+
+    <div class="record-card danger-card">
+        <div class="danger-note"><span class="danger-mark" aria-hidden="true">!</span><p>Bạn có chắc chắn muốn xóa thành viên <strong>@Model?.FullName</strong> không?</p></div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @if (Model != null)
+        {
+            <dl class="detail-grid">
+                <div class="detail-item"><dt>Họ và tên</dt><dd>@Model.FullName</dd></div>
+                <div class="detail-item"><dt>Mã sinh viên</dt><dd>@Model.StudentCode</dd></div>
+                <div class="detail-item"><dt>Email</dt><dd>@Model.Email</dd></div>
+                <div class="detail-item"><dt>Chức vụ</dt><dd>@Model.Position</dd></div>
+            </dl>
+            <form asp-action="Delete" asp-route-id="@Model.MemberId" method="post" class="form-actions">
+                <input type="hidden" name="id" value="@Model.MemberId" />
+                <button type="submit" class="btn btn-danger btn-solid">Xác nhận xóa</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </form>
+        }
+    </div>
+</div>

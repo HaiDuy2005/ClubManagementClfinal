@@ -1,0 +1,127 @@
+@model ClubManagement.Models.MemberRegistration
+
+@{
+    ViewData["Title"] = "Đăng Ký Tham Gia CLB";
+}
+<div class="back-navigation">
+    <button type="button" class="btn-back" onclick="goBack()">
+        <span aria-hidden="true">←</span>
+        Quay lại
+    </button>
+</div>
+
+<script>
+    function goBack() {
+        if (document.referrer &&
+            new URL(document.referrer).origin === window.location.origin) {
+            window.history.back();
+        } else {
+            window.location.href = '@Url.Action("Index", "Home")';
+        }
+    }
+</script>
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-lg border-0 p-4">
+        <h1 class="text-center text-primary mb-4">
+            Đăng Ký Tham Gia CLB Văn Nghệ
+        </h1>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <form asp-controller="MemberRegistration"
+              asp-action="Create"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="FullName" class="form-label">
+                        Họ và tên
+                    </label>
+                    <input asp-for="FullName"
+                           class="form-control"
+                           placeholder="Nhập họ và tên" />
+                    <span asp-validation-for="FullName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="StudentCode" class="form-label">
+                        Mã số sinh viên
+                    </label>
+                    <input asp-for="StudentCode"
+                           class="form-control"
+                           placeholder="Nhập mã số sinh viên" />
+                    <span asp-validation-for="StudentCode"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ClassName" class="form-label">
+                        Lớp
+                    </label>
+                    <input asp-for="ClassName"
+                           class="form-control"
+                           placeholder="Nhập lớp" />
+                    <span asp-validation-for="ClassName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Phone" class="form-label">
+                        Số điện thoại
+                    </label>
+                    <input asp-for="Phone"
+                           class="form-control"
+                           placeholder="Nhập số điện thoại" />
+                    <span asp-validation-for="Phone"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label asp-for="Email" class="form-label">
+                        Email
+                    </label>
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control"
+                           placeholder="Nhập email" />
+                    <span asp-validation-for="Email"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label asp-for="Reason" class="form-label">
+                        Lý do tham gia CLB
+                    </label>
+                    <textarea asp-for="Reason"
+                              rows="5"
+                              class="form-control"
+                              placeholder="Nhập lý do bạn muốn tham gia CLB"></textarea>
+                    <span asp-validation-for="Reason"
+                          class="text-danger"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg">
+                Gửi Đăng Ký
+            </button>
+        </form>
+    </div>
+</div>

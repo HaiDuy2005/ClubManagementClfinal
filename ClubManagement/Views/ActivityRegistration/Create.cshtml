@@ -1,0 +1,35 @@
+@model ClubManagement.Models.ActivityRegistration
+
+<h2>Đăng Ký Hoạt Động</h2>
+
+<form asp-action="Create" method="post">
+
+ <input asp-for="ActivityId" type="hidden" />
+ <input asp-for="ActivityName" type="hidden" />
+ <input asp-for="ActivityDate" type="hidden" />
+
+ <div class="mb-3">
+ <label>Họ và Tên</label>
+ <input asp-for="FullName" class="form-control" />
+ </div>
+
+ <div class="mb-3">
+ <label>Lớp</label>
+ <input asp-for="ClassName" class="form-control" />
+ </div>
+
+ <div class="mb-3">
+ <label>Mã Sinh Viên</label>
+ <input asp-for="StudentCode" class="form-control" />
+ </div>
+
+ <div class="mb-3">
+ <label>Email</label>
+ <input asp-for="Email" class="form-control" />
+ </div>
+
+ <button type="submit" class="btn btn-success">
+ Đăng Ký
+ </button>
+
+</form>

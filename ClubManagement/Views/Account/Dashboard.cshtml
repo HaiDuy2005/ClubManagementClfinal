@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "Bảng điều khiển quản trị";
+}
+<section class="admin-page-heading">
+    <div><div class="admin-eyebrow"><span></span> KHÔNG GIAN LÀM VIỆC</div><h1>Bảng điều khiển<span>.</span></h1><p>Theo dõi nhịp hoạt động của CLB và quản lý mọi thứ từ một nơi.</p></div>
+    <div class="admin-heading-badge"><img class="club-logo club-logo-admin" src="~/images/logo.svg" asp-append-version="true" alt="Logo CLB Văn nghệ" width="34" height="34" /><div><strong>CLB Văn Nghệ</strong><small>KHU VỰC QUẢN TRỊ</small></div></div>
+</section>
+<section class="admin-metrics" aria-label="Tổng quan dữ liệu">
+    <article class="admin-metric metric-plum"><div class="metric-top"><span>01 / CỘNG ĐỒNG</span></div><strong data-count="@ViewBag.TotalMembers">@ViewBag.TotalMembers</strong><h2>Thành viên</h2><p>Những người tạo nên câu lạc bộ</p></article>
+    <article class="admin-metric metric-orange"><div class="metric-top"><span>02 / LỊCH TRÌNH</span></div><strong data-count="@ViewBag.TotalActivities">@ViewBag.TotalActivities</strong><h2>Hoạt động</h2><p>Chương trình và buổi sinh hoạt</p></article>
+    <article class="admin-metric metric-lilac"><div class="metric-top"><span>03 / TỔ CHỨC</span></div><strong data-count="@ViewBag.TotalClubs">@ViewBag.TotalClubs</strong><h2>Câu lạc bộ</h2><p>Không gian sáng tạo đang quản lý</p></article>
+</section>
+<section class="admin-workspace">
+    <div class="workspace-heading"><div><span class="section-kicker">ĐIỀU HÀNH CÂU LẠC BỘ</span><h2>Bạn muốn làm gì hôm nay?</h2></div></div>
+    <div class="admin-action-grid" data-row-glide=".admin-action-card">
+        <a asp-controller="Members" asp-action="Index" class="admin-action-card"><span class="action-number">01</span><strong>Quản lý thành viên</strong><small>Xem và cập nhật hồ sơ</small><span class="action-arrow">↗</span></a>
+        <a asp-controller="ClubActivities" asp-action="Index" class="admin-action-card"><span class="action-number">02</span><strong>Quản lý hoạt động</strong><small>Tạo và điều phối chương trình</small><span class="action-arrow">↗</span></a>
+        <a asp-controller="Attendance" asp-action="Index" class="admin-action-card"><span class="action-number">03</span><strong>Quản lý điểm danh</strong><small>Kiểm tra và duyệt yêu cầu</small><span class="action-arrow">↗</span></a>
+        <a asp-controller="MemberRegistration" asp-action="AdminList" class="admin-action-card"><span class="action-number">04</span><strong>Đơn đăng ký thành viên</strong><small>Xem các yêu cầu tham gia</small><span class="action-arrow">↗</span></a>
+        <a asp-controller="ActivityRegistration" asp-action="Index" class="admin-action-card"><span class="action-number">05</span><strong>Đăng ký hoạt động</strong><small>Danh sách người tham gia</small><span class="action-arrow">↗</span></a>
+        <a asp-controller="Contact" asp-action="AdminList" class="admin-action-card"><span class="action-number">06</span><strong>Tin nhắn liên hệ</strong><small>Phản hồi thành viên</small><span class="action-arrow">↗</span></a>
+    </div>
+    <div class="admin-logout-row"><span>Hoàn tất công việc? Hãy đăng xuất để bảo vệ tài khoản.</span><a asp-controller="Account" asp-action="Logout" class="btn btn-logout">Đăng xuất <span aria-hidden="true">↗</span></a></div>
+</section>

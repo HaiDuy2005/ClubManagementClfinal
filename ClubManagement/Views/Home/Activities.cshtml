@@ -1,0 +1,182 @@
+@model IEnumerable<ClubManagement.Models.ClubActivity>
+
+@{
+    ViewData["Title"] = "Hoạt động";
+}
+
+
+<div class="back-navigation">
+    <button type="button" class="btn-back"
+            onclick="goBack()">
+        <span aria-hidden="true">←</span>
+        Quay lại
+    </button>
+</div>
+
+
+<div class="mb-4">
+    <p class="text-uppercase small fw-bold mb-1"
+       style="color:var(--brand);letter-spacing:.12em">
+        Lịch câu lạc bộ
+    </p>
+
+    <h1 class="page-title">Hoạt động CLB</h1>
+
+    <p class="page-lead">
+        Khám phá chương trình sắp diễn ra và đăng ký tham gia cùng các thành viên.
+    </p>
+</div>
+
+
+<div class="content-card activity-search-card mb-4">
+    <div class="activity-search-heading">
+        <div>
+            <h2 class="h5 mb-1">Tìm kiếm hoạt động</h2>
+            <p class="text-secondary mb-0">
+                Tìm theo tên, địa điểm hoặc ngày tổ chức.
+            </p>
+        </div>
+        <span class="activity-search-icon">⌕</span>
+    </div>
+
+    <form asp-controller="Home"
+          asp-action="Activities"
+          method="get"
+          class="activity-search-form">
+
+        <div class="search-field">
+            <label for="searchName" class="form-label">
+                Tên hoạt động
+            </label>
+            <input type="text"
+                   id="searchName"
+                   name="searchName"
+                   value="@ViewBag.SearchName"
+                   class="form-control"
+                   placeholder="Ví dụ: Văn nghệ, Rock..." />
+        </div>
+
+        <div class="search-field">
+            <label for="searchLocation" class="form-label">
+                Địa điểm
+            </label>
+            <input type="text"
+                   id="searchLocation"
+                   name="searchLocation"
+                   value="@ViewBag.SearchLocation"
+                   class="form-control"
+                   placeholder="Nhập địa điểm..." />
+        </div>
+
+        <div class="search-field">
+            <label for="searchDate" class="form-label">
+                Ngày tổ chức
+            </label>
+            <input type="date"
+                   id="searchDate"
+                   name="searchDate"
+                   value="@ViewBag.SearchDate"
+                   class="form-control" />
+        </div>
+
+        <div class="search-actions">
+            <button type="submit" class="btn btn-primary">
+                <span aria-hidden="true">⌕</span>
+                Tìm kiếm
+            </button>
+
+            <a asp-controller="Home"
+               asp-action="Activities"
+               class="btn btn-outline-secondary">
+                Xóa bộ lọc
+            </a>
+        </div>
+    </form>
+</div>
+
+
+<div class="content-card p-3 p-md-4">
+    <div class="activity-list-heading">
+        <div>
+            <h2 class="h5 mb-1">Danh sách hoạt động</h2>
+            <p class="text-secondary small mb-0">
+                Hoạt động mới nhất được hiển thị trước.
+            </p>
+        </div>
+
+        <span class="activity-sort-badge">
+            Mới nhất trước ↓
+        </span>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Tên hoạt động</th>
+                        <th>Địa điểm</th>
+                        <th>Ngày tổ chức</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">
+                                @item.ActivityName
+                            </td>
+
+                            <td>@item.Location</td>
+
+                            <td>
+                                @item.ActivityDate.ToString("dd/MM/yyyy")
+                            </td>
+
+                            <td class="text-end">
+                                <a asp-controller="ActivityRegistration"
+                                   asp-action="Create"
+                                   asp-route-id="@item.ActivityId"
+                                   class="btn btn-sm btn-primary">
+                                    Đăng ký tham gia
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <div class="activity-empty-icon">⌕</div>
+            <h2 class="h5 mt-3">
+                Không tìm thấy hoạt động
+            </h2>
+            <p class="text-secondary">
+                Thử thay đổi từ khóa hoặc xóa bộ lọc để xem tất cả hoạt động.
+            </p>
+
+            <a asp-controller="Home"
+               asp-action="Activities"
+               class="btn btn-primary">
+                Xem tất cả hoạt động
+            </a>
+        </div>
+    }
+</div>
+
+<script>
+    function goBack() {
+        if (document.referrer &&
+            new URL(document.referrer).origin === window.location.origin) {
+            window.history.back();
+        } else {
+            window.location.href = '@Url.Action("Index", "Home")';
+        }
+    }
+</script>

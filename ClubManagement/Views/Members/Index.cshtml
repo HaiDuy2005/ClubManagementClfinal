@@ -1,0 +1,197 @@
+@model IEnumerable<ClubManagement.Models.Member>
+
+@{
+    ViewData["Title"] = "Danh Sách Thành Viên";
+
+    var searchName = ViewBag.SearchName as string ?? "";
+    var searchStudentCode = ViewBag.SearchStudentCode as string ?? "";
+    var searchClass = ViewBag.SearchClass as string ?? "";
+    var searchEmail = ViewBag.SearchEmail as string ?? "";
+    var searchPhone = ViewBag.SearchPhone as string ?? "";
+    var searchPosition = ViewBag.SearchPosition as string ?? "";
+}
+
+<div class="container py-4">
+
+   <a asp-controller="Account"
+   asp-action="Dashboard"
+   class="btn btn-outline-secondary">
+     Quay lại quản trị
+</a>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1>Danh Sách Thành Viên</h1>
+                <p class="text-muted mb-0">
+                    Tìm kiếm và quản lý thông tin thành viên CLB Văn Nghệ.
+                </p>
+            </div>
+
+            <a asp-action="Create" class="btn btn-success">
+                + Thêm Thành Viên
+            </a>
+        </div>
+    </div>
+
+    <div class="page-card">
+
+        <form asp-controller="Members"
+              asp-action="Index"
+              method="get"
+              class="mb-4">
+
+            <h5 class="mb-3">Tìm kiếm thành viên</h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Họ và tên</label>
+                    <input type="text"
+                           name="searchName"
+                           value="@searchName"
+                           class="form-control"
+                           placeholder="Nhập họ tên..." />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Mã sinh viên</label>
+                    <input type="text"
+                           name="searchStudentCode"
+                           value="@searchStudentCode"
+                           class="form-control"
+                           placeholder="Nhập mã sinh viên..." />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Lớp</label>
+                    <input type="text"
+                           name="searchClass"
+                           value="@searchClass"
+                           class="form-control"
+                           placeholder="Nhập tên lớp..." />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Email</label>
+                    <input type="text"
+                           name="searchEmail"
+                           value="@searchEmail"
+                           class="form-control"
+                           placeholder="Nhập email..." />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text"
+                           name="searchPhone"
+                           value="@searchPhone"
+                           class="form-control"
+                           placeholder="Nhập số điện thoại..." />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Chức vụ</label>
+                    <input type="text"
+                           name="searchPosition"
+                           value="@searchPosition"
+                           class="form-control"
+                           placeholder="Nhập chức vụ..." />
+                </div>
+
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">
+                    Tìm kiếm
+                </button>
+
+                <a asp-controller="Members"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Làm mới
+                </a>
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Danh sách thành viên</h5>
+
+            <span class="badge bg-primary">
+                @Model.Count() thành viên
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th>Họ Tên</th>
+                        <th>Mã Sinh Viên</th>
+                        <th>Lớp</th>
+                        <th>Email</th>
+                        <th>SĐT</th>
+                        <th>Chức Vụ</th>
+                        <th>Điểm Rèn Luyện</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.FullName</td>
+                                <td>@item.StudentCode</td>
+                                <td>@item.ClassName</td>
+                                <td>@item.Email</td>
+                                <td>@item.Phone</td>
+                                <td>@item.Position</td>
+                                <td>@item.TrainingPoints</td>
+
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.MemberId"
+                                           class="btn btn-warning btn-sm">
+                                            Sửa
+                                        </a>
+
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.MemberId"
+                                           class="btn btn-info btn-sm">
+                                            Chi tiết
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.MemberId"
+                                           class="btn btn-danger btn-sm">
+                                            Xóa
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <p class="mb-1 fw-bold">
+                                    Không tìm thấy thành viên
+                                </p>
+
+                                <span class="text-muted">
+                                    Hãy thử thay đổi từ khóa tìm kiếm.
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
