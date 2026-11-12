@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +17,6 @@ namespace ClubManagement.Controllers
         {
             _context = context;
         }
-
 
         public async Task<IActionResult> Index(
             string? searchName,
@@ -63,7 +61,6 @@ namespace ClubManagement.Controllers
             return View(activities);
         }
 
-
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -103,7 +100,6 @@ namespace ClubManagement.Controllers
                 ActivityDate = DateTime.Now
             });
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -186,6 +182,7 @@ namespace ClubManagement.Controllers
             return View(activity);
         }
 
+        // POST: ClubActivities/Delete/5 (XÓA DÂY CHUYỀN HOẠT ĐỘNG TỰ ĐỘNG)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -195,28 +192,22 @@ namespace ClubManagement.Controllers
             if (activity == null)
                 return RedirectToAction(nameof(Index));
 
-            try
-            {
-                _context.Activities.Remove(activity);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                ModelState.AddModelError(
-                    string.Empty,
-                    "Không thể xóa hoạt động này vì vẫn còn đăng ký hoặc điểm danh liên quan.");
+            // 1. Xóa các đơn đăng ký thuộc về hoạt động này
+            var registrations = _context.ActivityRegistrations
+                .Where(r => r.ActivityId == id);
+            _context.ActivityRegistrations.RemoveRange(registrations);
 
-                _context.ChangeTracker.Clear();
+            // 2. Xóa dữ liệu điểm danh thuộc về hoạt động này
+            var attendances = _context.Set<Attendance>()
+                .Where(a => a.ActivityId == id);
+            _context.Set<Attendance>().RemoveRange(attendances);
 
-                var again = await _context.Activities
-                    .FirstOrDefaultAsync(a => a.ActivityId == id);
-
-                return View(again);
-            }
+            // 3. Xóa hoạt động (Không làm ảnh hưởng Nhóm hay Thành viên)
+            _context.Activities.Remove(activity);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
-
 
         private async Task LoadClubsAsync(int? selectedId)
         {
@@ -232,14 +223,12 @@ namespace ClubManagement.Controllers
                 selectedId);
         }
 
-
         private bool ClubActivityExists(int id)
         {
             return _context.Activities.Any(a =>
                 a.ActivityId == id);
         }
 
- 
         public async Task<IActionResult> Participants(int id)
         {
             var list = await _context.ActivityRegistrations

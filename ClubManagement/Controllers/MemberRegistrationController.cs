@@ -3,6 +3,7 @@ using System.Linq;
 using ClubManagement.Data;
 using ClubManagement.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClubManagement.Controllers
@@ -17,9 +18,20 @@ namespace ClubManagement.Controllers
             _context = context;
         }
 
+        private void LoadClubs(int? selectedId = null)
+        {
+            var clubs = _context.Clubs
+                .AsNoTracking()
+                .OrderBy(c => c.ClubName)
+                .ToList();
+
+            ViewBag.Clubs = new SelectList(clubs, "ClubId", "ClubName", selectedId);
+        }
+
         [HttpGet]
         public IActionResult Create()
         {
+            LoadClubs();
             return View(new MemberRegistration());
         }
 
@@ -69,15 +81,23 @@ namespace ClubManagement.Controllers
                     "Vui lòng nhập email.");
             }
 
+            if (registration.ClubId == null || registration.ClubId <= 0)
+            {
+                ModelState.AddModelError(
+                    nameof(registration.ClubId),
+                    "Vui lòng chọn nhóm muốn tham gia.");
+            }
+
             if (string.IsNullOrWhiteSpace(registration.Reason))
             {
                 ModelState.AddModelError(
                     nameof(registration.Reason),
-                    "Vui lòng nhập lý do tham gia CLB.");
+                    "Vui lòng nhập lý do tham gia nhóm.");
             }
 
             if (!ModelState.IsValid)
             {
+                LoadClubs(registration.ClubId);
                 return View(registration);
             }
 
@@ -101,6 +121,7 @@ namespace ClubManagement.Controllers
                     "Không thể lưu đăng ký vào cơ sở dữ liệu. " +
                     "Vui lòng kiểm tra dữ liệu và thử lại.");
 
+                LoadClubs(registration.ClubId);
                 return View(registration);
             }
         }
@@ -114,6 +135,7 @@ namespace ClubManagement.Controllers
             string? searchStatus)
         {
             var query = _context.MemberRegistrations
+                .Include(x => x.Club)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -195,6 +217,18 @@ namespace ClubManagement.Controllers
                 return RedirectToAction(nameof(AdminList));
             }
 
+            var targetClub = registration.ClubId.HasValue
+                ? _context.Clubs.FirstOrDefault(c => c.ClubId == registration.ClubId.Value)
+                : _context.Clubs.FirstOrDefault();
+
+            if (targetClub == null)
+            {
+                TempData["AdminError"] =
+                    "Nhóm được chọn không còn tồn tại trong hệ thống.";
+
+                return RedirectToAction(nameof(AdminList));
+            }
+
             var member = new Member
             {
                 FullName = registration.FullName,
@@ -204,7 +238,7 @@ namespace ClubManagement.Controllers
                 Phone = registration.Phone,
                 Position = "Thành viên",
                 TrainingPoints = 0,
-                ClubId = 1
+                ClubId = targetClub.ClubId
             };
 
             _context.Members.Add(member);
@@ -215,7 +249,7 @@ namespace ClubManagement.Controllers
                 _context.SaveChanges();
 
                 TempData["AdminSuccess"] =
-                    "Đã duyệt đăng ký và thêm thành viên thành công.";
+                    $"Đã duyệt đăng ký và thêm thành viên vào {targetClub.ClubName} thành công.";
             }
             catch (DbUpdateException)
             {
@@ -223,13 +257,11 @@ namespace ClubManagement.Controllers
                 registration.Status = "Pending";
 
                 TempData["AdminError"] =
-                    "Không thể lưu thành viên. Hãy kiểm tra dữ liệu " +
-                    "và mã CLB trước khi thử lại.";
+                    "Không thể lưu thành viên. Vui lòng kiểm tra lại dữ liệu.";
             }
 
             return RedirectToAction(nameof(AdminList));
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -267,6 +299,69 @@ namespace ClubManagement.Controllers
             {
                 TempData["AdminError"] =
                     "Không thể cập nhật trạng thái đăng ký.";
+            }
+
+            return RedirectToAction(nameof(AdminList));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            var registration = _context.MemberRegistrations
+                .FirstOrDefault(x => x.RegistrationId == id);
+
+            if (registration == null)
+            {
+                TempData["AdminError"] =
+                    "Không tìm thấy đơn đăng ký.";
+
+                return RedirectToAction(nameof(AdminList));
+            }
+
+            try
+            {
+                _context.MemberRegistrations.Remove(registration);
+                _context.SaveChanges();
+
+                TempData["AdminSuccess"] =
+                    "Đã xóa đơn đăng ký thành công.";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["AdminError"] =
+                    "Không thể xóa đơn đăng ký này.";
+            }
+
+            return RedirectToAction(nameof(AdminList));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteAll()
+        {
+            var allRegistrations = _context.MemberRegistrations.ToList();
+
+            if (!allRegistrations.Any())
+            {
+                TempData["AdminError"] =
+                    "Danh sách đơn đăng ký hiện đang trống.";
+
+                return RedirectToAction(nameof(AdminList));
+            }
+
+            try
+            {
+                _context.MemberRegistrations.RemoveRange(allRegistrations);
+                _context.SaveChanges();
+
+                TempData["AdminSuccess"] =
+                    $"Đã xóa toàn bộ {allRegistrations.Count} đơn đăng ký thành công.";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["AdminError"] =
+                    "Không thể xóa toàn bộ danh sách đơn đăng ký.";
             }
 
             return RedirectToAction(nameof(AdminList));

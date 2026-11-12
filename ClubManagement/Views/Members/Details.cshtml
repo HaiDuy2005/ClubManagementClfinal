@@ -17,7 +17,10 @@
             <span class="detail-avatar">@initial</span>
             <div>
                 <h2>@Model.FullName</h2>
-                <span class="badge bg-primary">@Model.Position</span>
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="badge bg-primary">@Model.Position</span>
+                    <span class="badge bg-info text-dark">@(Model.Club?.ClubName ?? "Chưa có nhóm")</span>
+                </div>
             </div>
         </div>
         <dl class="detail-grid">
@@ -25,8 +28,8 @@
             <div class="detail-item"><dt>Lớp</dt><dd>@Model.ClassName</dd></div>
             <div class="detail-item"><dt>Email</dt><dd>@Model.Email</dd></div>
             <div class="detail-item"><dt>Số điện thoại</dt><dd>@Model.Phone</dd></div>
+            <div class="detail-item"><dt>Nhóm</dt><dd>@(Model.Club?.ClubName ?? "Chưa có nhóm")</dd></div>
             <div class="detail-item"><dt>Điểm rèn luyện</dt><dd>@Model.TrainingPoints</dd></div>
-            <div class="detail-item"><dt>Mã câu lạc bộ</dt><dd>@Model.ClubId</dd></div>
         </dl>
         <div class="form-actions">
             <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-warning">Sửa thông tin</a>

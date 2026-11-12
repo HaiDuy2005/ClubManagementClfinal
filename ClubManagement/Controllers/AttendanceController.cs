@@ -25,7 +25,6 @@ namespace ClubManagement.Controllers
             _minioStorage = minioStorage;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Index(
             string? searchName,
@@ -38,65 +37,46 @@ namespace ClubManagement.Controllers
                 .AsNoTracking()
                 .AsQueryable();
 
-
             if (!string.IsNullOrWhiteSpace(searchName))
             {
-                query = query.Where(x =>
-                    x.FullName.Contains(searchName));
+                query = query.Where(x => x.FullName.Contains(searchName));
             }
-
 
             if (!string.IsNullOrWhiteSpace(searchStudentCode))
             {
-                query = query.Where(x =>
-                    x.StudentCode.Contains(searchStudentCode));
+                query = query.Where(x => x.StudentCode.Contains(searchStudentCode));
             }
-
 
             if (searchDate.HasValue)
             {
                 var date = searchDate.Value.Date;
                 var nextDate = date.AddDays(1);
-
-                query = query.Where(x =>
-                    x.AttendanceDate >= date &&
-                    x.AttendanceDate < nextDate);
+                query = query.Where(x => x.AttendanceDate >= date && x.AttendanceDate < nextDate);
             }
 
-
-            if (!string.IsNullOrWhiteSpace(searchStatus)
-                && searchStatus != "All")
+            if (!string.IsNullOrWhiteSpace(searchStatus) && searchStatus != "All")
             {
-                query = query.Where(x =>
-                    x.Status == searchStatus);
+                query = query.Where(x => x.Status == searchStatus);
             }
-
 
             if (!string.IsNullOrWhiteSpace(searchActivity))
             {
                 var matchingActivityIds = _context.Activities
                     .AsNoTracking()
-                    .Where(a =>
-                        a.ActivityName.Contains(searchActivity))
+                    .Where(a => a.ActivityName.Contains(searchActivity))
                     .Select(a => a.ActivityId);
 
-                query = query.Where(x =>
-                    matchingActivityIds.Contains(x.ActivityId));
+                query = query.Where(x => matchingActivityIds.Contains(x.ActivityId));
             }
-
 
             var attendanceList = await query
                 .OrderByDescending(x => x.AttendanceDate)
                 .ThenByDescending(x => x.AttendanceId)
                 .ToListAsync();
 
-
             ViewBag.ActivityNames = await _context.Activities
                 .AsNoTracking()
-                .ToDictionaryAsync(
-                    x => x.ActivityId,
-                    x => x.ActivityName);
-
+                .ToDictionaryAsync(x => x.ActivityId, x => x.ActivityName);
 
             ViewBag.SearchName = searchName;
             ViewBag.SearchStudentCode = searchStudentCode;
@@ -107,7 +87,6 @@ namespace ClubManagement.Controllers
             return View(attendanceList);
         }
 
-
         [HttpGet]
         public IActionResult Create()
         {
@@ -115,19 +94,20 @@ namespace ClubManagement.Controllers
             return View(new ActivityAttendance());
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             ActivityAttendance model,
             DateTime attendanceDate,
-            IFormFile evidenceFile)
+            IFormFile? evidenceFile)
         {
+            model.FullName = model.FullName?.Trim() ?? "";
+            model.StudentCode = model.StudentCode?.Trim() ?? "";
+            model.ClassName = model.ClassName?.Trim() ?? "";
+
             if (attendanceDate == default)
             {
-                ModelState.AddModelError(
-                    "",
-                    "Vui lòng chọn ngày tham gia.");
+                ModelState.AddModelError("", "Vui lòng chọn ngày tham gia.");
             }
 
             bool activityExists = await _context.Activities
@@ -135,56 +115,35 @@ namespace ClubManagement.Controllers
 
             if (!activityExists)
             {
-                ModelState.AddModelError(
-                    nameof(model.ActivityId),
-                    "Vui lòng chọn hoạt động hợp lệ.");
+                ModelState.AddModelError(nameof(model.ActivityId), "Vui lòng chọn hoạt động hợp lệ.");
             }
 
             if (string.IsNullOrWhiteSpace(model.ClassName))
             {
-                ModelState.AddModelError(
-                    nameof(model.ClassName),
-                    "Vui lòng nhập lớp.");
+                ModelState.AddModelError(nameof(model.ClassName), "Vui lòng nhập lớp.");
             }
 
             if (evidenceFile == null || evidenceFile.Length == 0)
             {
-                ModelState.AddModelError(
-                    "evidenceFile",
-                    "Vui lòng chọn ảnh minh chứng.");
+                ModelState.AddModelError("evidenceFile", "Vui lòng chọn ảnh minh chứng.");
             }
             else
             {
                 const long maxFileSize = 5 * 1024 * 1024;
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+                var allowedContentTypes = new[] { "image/jpeg", "image/png", "image/webp" };
 
-                var allowedExtensions = new[]
-                {
-                    ".jpg", ".jpeg", ".png", ".webp"
-                };
-
-                var allowedContentTypes = new[]
-                {
-                    "image/jpeg", "image/png", "image/webp"
-                };
-
-                string extension = Path
-                    .GetExtension(evidenceFile.FileName)
-                    .ToLowerInvariant();
+                string extension = Path.GetExtension(evidenceFile.FileName).ToLowerInvariant();
 
                 if (evidenceFile.Length > maxFileSize)
                 {
-                    ModelState.AddModelError(
-                        "evidenceFile",
-                        "Ảnh minh chứng không được vượt quá 5 MB.");
+                    ModelState.AddModelError("evidenceFile", "Ảnh minh chứng không được vượt quá 5 MB.");
                 }
 
                 if (!allowedExtensions.Contains(extension) ||
-                    !allowedContentTypes.Contains(
-                        evidenceFile.ContentType.ToLowerInvariant()))
+                    !allowedContentTypes.Contains(evidenceFile.ContentType.ToLowerInvariant()))
                 {
-                    ModelState.AddModelError(
-                        "evidenceFile",
-                        "Chỉ chấp nhận ảnh JPG, JPEG, PNG hoặc WEBP.");
+                    ModelState.AddModelError("evidenceFile", "Chỉ chấp nhận ảnh JPG, JPEG, PNG hoặc WEBP.");
                 }
             }
 
@@ -194,29 +153,25 @@ namespace ClubManagement.Controllers
                 return View(model);
             }
 
-            string objectKey;
+            string tempFileName = $"{Guid.NewGuid()}{Path.GetExtension(evidenceFile!.FileName)}";
+            string tempFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "temp");
 
-            try
+            if (!Directory.Exists(tempFolder))
             {
-                objectKey = await _minioStorage.UploadEvidenceAsync(
-                    evidenceFile!);
+                Directory.CreateDirectory(tempFolder);
             }
-            catch (Exception)
-            {
-                ModelState.AddModelError(
-                    "",
-                    "Không thể tải ảnh lên MinIO. Vui lòng thử lại.");
 
-                LoadActivities();
-                return View(model);
+            string tempFilePath = Path.Combine(tempFolder, tempFileName);
+            using (var stream = new FileStream(tempFilePath, FileMode.Create))
+            {
+                await evidenceFile.CopyToAsync(stream);
             }
 
             model.AttendanceDate = attendanceDate;
             model.Status = "Pending";
             model.TrainingPoints = 0;
-            model.EvidenceObjectKey = objectKey;
-            model.EvidenceFileName = Path.GetFileName(
-                evidenceFile!.FileName);
+            model.EvidenceObjectKey = $"temp/{tempFileName}";
+            model.EvidenceFileName = Path.GetFileName(evidenceFile.FileName);
             model.AdminNote = "";
 
             try
@@ -224,26 +179,23 @@ namespace ClubManagement.Controllers
                 _context.ActivityAttendances.Add(model);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _context.Entry(model).State = EntityState.Detached;
+                if (System.IO.File.Exists(tempFilePath))
+                {
+                    System.IO.File.Delete(tempFilePath);
+                }
 
-                ModelState.AddModelError(
-                    "",
-                    "Ảnh đã tải lên MinIO nhưng không lưu được " +
-                    "thông tin điểm danh vào cơ sở dữ liệu.");
-
+                var detail = ex.InnerException?.Message ?? ex.Message;
+                ModelState.AddModelError("", $"Không thể lưu thông tin điểm danh vào cơ sở dữ liệu: {detail}");
                 LoadActivities();
                 return View(model);
             }
 
-            TempData["AttendanceSuccess"] =
-                "Gửi yêu cầu điểm danh thành công. Vui lòng chờ Admin duyệt.";
-
+            TempData["AttendanceSuccess"] = "Gửi yêu cầu điểm danh thành công. Vui lòng chờ Admin duyệt.";
             return RedirectToAction(nameof(Create));
         }
 
-    
         [HttpGet]
         public async Task<IActionResult> Evidence(int id)
         {
@@ -251,28 +203,34 @@ namespace ClubManagement.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.AttendanceId == id);
 
-            if (attendance == null ||
-                string.IsNullOrWhiteSpace(attendance.EvidenceObjectKey))
+            if (attendance == null || string.IsNullOrWhiteSpace(attendance.EvidenceObjectKey))
             {
                 return NotFound("Không tìm thấy ảnh minh chứng.");
             }
 
+            var extension = Path.GetExtension(attendance.EvidenceFileName ?? "").ToLowerInvariant();
+            var contentType = extension switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                _ => "application/octet-stream"
+            };
+
+            if (attendance.EvidenceObjectKey.StartsWith("temp/"))
+            {
+                var relativePath = attendance.EvidenceObjectKey.Replace('/', Path.DirectorySeparatorChar);
+                var localPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", relativePath);
+                if (System.IO.File.Exists(localPath))
+                {
+                    var bytes = await System.IO.File.ReadAllBytesAsync(localPath);
+                    return File(bytes, contentType);
+                }
+            }
+
             try
             {
-                var bytes = await _minioStorage.DownloadEvidenceAsync(
-                    attendance.EvidenceObjectKey);
-
-                var extension = Path.GetExtension(
-                    attendance.EvidenceFileName).ToLowerInvariant();
-
-                var contentType = extension switch
-                {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".webp" => "image/webp",
-                    _ => "application/octet-stream"
-                };
-
+                var bytes = await _minioStorage.DownloadEvidenceAsync(attendance.EvidenceObjectKey);
                 return File(bytes, contentType);
             }
             catch (Exception)
@@ -282,7 +240,6 @@ namespace ClubManagement.Controllers
                     statusCode: 500);
             }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -301,17 +258,13 @@ namespace ClubManagement.Controllers
 
             if (attendance.Status != "Pending")
             {
-                TempData["AttendanceError"] =
-                    "Yêu cầu này đã được xử lý trước đó.";
-
+                TempData["AttendanceError"] = "Yêu cầu này đã được xử lý trước đó.";
                 return RedirectToAction(nameof(Index));
             }
 
             if (trainingPoints != 1)
             {
-                TempData["AttendanceError"] =
-                    "Mỗi lần duyệt chỉ được cộng 1 điểm rèn luyện.";
-
+                TempData["AttendanceError"] = "Mỗi lần duyệt chỉ được cộng 1 điểm rèn luyện.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -319,9 +272,7 @@ namespace ClubManagement.Controllers
                 string.IsNullOrWhiteSpace(attendance.StudentCode) ||
                 string.IsNullOrWhiteSpace(attendance.ClassName))
             {
-                TempData["AttendanceError"] =
-                    "Yêu cầu thiếu họ tên, mã sinh viên hoặc lớp.";
-
+                TempData["AttendanceError"] = "Yêu cầu thiếu họ tên, mã sinh viên hoặc lớp.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -340,14 +291,52 @@ namespace ClubManagement.Controllers
             if (members.Count != 1)
             {
                 TempData["AttendanceError"] = members.Count == 0
-                    ? "Không tìm thấy thành viên khớp họ tên, mã sinh viên và lớp. Hãy kiểm tra thông tin."
+                    ? "Không tìm thấy thành viên khớp họ tên, mã sinh viên và lớp trong danh sách thành viên."
                     : "Có nhiều thành viên trùng thông tin. Vui lòng kiểm tra dữ liệu.";
 
                 return RedirectToAction(nameof(Index));
             }
 
-            var member = members[0];
+            if (attendance.EvidenceObjectKey?.StartsWith("temp/") == true)
+            {
+                var relativePath = attendance.EvidenceObjectKey.Replace('/', Path.DirectorySeparatorChar);
+                var localPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", relativePath);
+                if (System.IO.File.Exists(localPath))
+                {
+                    try
+                    {
+                        using var stream = System.IO.File.OpenRead(localPath);
+                        var extension = Path.GetExtension(attendance.EvidenceFileName ?? "").ToLowerInvariant();
+                        var contentType = extension switch
+                        {
+                            ".jpg" or ".jpeg" => "image/jpeg",
+                            ".png" => "image/png",
+                            ".webp" => "image/webp",
+                            _ => "application/octet-stream"
+                        };
 
+                        var formFile = new FormFile(stream, 0, stream.Length, "evidenceFile", attendance.EvidenceFileName ?? "evidence.jpg")
+                        {
+                            Headers = new HeaderDictionary(),
+                            ContentType = contentType
+                        };
+
+                        string minioKey = await _minioStorage.UploadEvidenceAsync(formFile);
+
+                        stream.Close();
+                        System.IO.File.Delete(localPath);
+
+                        attendance.EvidenceObjectKey = minioKey;
+                    }
+                    catch (Exception ex)
+                    {
+                        TempData["AttendanceError"] = $"Không thể đẩy ảnh lên MinIO ({ex.Message}). Vui lòng kiểm tra container MinIO trong Docker.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+
+            var member = members[0];
             member.TrainingPoints += 1;
 
             attendance.Status = "Approved";
@@ -356,13 +345,10 @@ namespace ClubManagement.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["AttendanceSuccess"] =
-                $"Đã duyệt điểm danh cho {member.FullName} và cộng 1 điểm rèn luyện.";
-
+            TempData["AttendanceSuccess"] = $"Đã duyệt điểm danh cho {member.FullName}, cộng 1 điểm rèn luyện và lưu ảnh lên MinIO thành công!";
             return RedirectToAction(nameof(Index));
         }
 
- 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(
@@ -379,18 +365,24 @@ namespace ClubManagement.Controllers
 
             if (attendance.Status != "Pending")
             {
-                TempData["AttendanceError"] =
-                    "Yêu cầu này đã được xử lý trước đó.";
-
+                TempData["AttendanceError"] = "Yêu cầu này đã được xử lý trước đó.";
                 return RedirectToAction(nameof(Index));
             }
 
             if (string.IsNullOrWhiteSpace(adminNote))
             {
-                TempData["AttendanceError"] =
-                    "Vui lòng nhập lý do từ chối.";
-
+                TempData["AttendanceError"] = "Vui lòng nhập lý do từ chối.";
                 return RedirectToAction(nameof(Index));
+            }
+
+            if (attendance.EvidenceObjectKey?.StartsWith("temp/") == true)
+            {
+                var relativePath = attendance.EvidenceObjectKey.Replace('/', Path.DirectorySeparatorChar);
+                var localPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", relativePath);
+                if (System.IO.File.Exists(localPath))
+                {
+                    System.IO.File.Delete(localPath);
+                }
             }
 
             attendance.Status = "Rejected";
@@ -399,13 +391,10 @@ namespace ClubManagement.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["AttendanceSuccess"] =
-                "Đã từ chối yêu cầu điểm danh.";
-
+            TempData["AttendanceSuccess"] = "Đã từ chối yêu cầu điểm danh.";
             return RedirectToAction(nameof(Index));
         }
 
- 
         private void LoadActivities()
         {
             ViewBag.Activities = new SelectList(

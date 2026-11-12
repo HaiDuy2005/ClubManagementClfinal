@@ -1,29 +1,51 @@
 @model ClubManagement.Models.Club
 
 @{
-    ViewData["Title"] = "Chi tiết câu lạc bộ";
+    ViewData["Title"] = "Chi tiết nhóm - " + Model.ClubName;
 }
 
-<div class="record-page">
-    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
-    <header class="record-head">
-        <h1>Chi tiết câu lạc bộ</h1>
-        <p class="text-muted">Thông tin chung của câu lạc bộ.</p>
-    </header>
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        ← Quay lại danh sách
+    </a>
+</div>
 
-    <div class="record-card">
-        <div class="detail-hero">
-            <span class="detail-avatar">@(string.IsNullOrWhiteSpace(Model.ClubName) ? "?" : Model.ClubName.Trim().Substring(0, 1).ToUpper())</span>
-            <div><h2>@Model.ClubName</h2></div>
+<div class="mb-4">
+    <h1 class="fw-bold mb-1">Chi tiết nhóm</h1>
+    <p class="text-secondary mb-0">Thông tin chung của nhóm.</p>
+</div>
+
+<div class="content-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 56px; height: 56px;">
+            @(string.IsNullOrEmpty(Model.ClubName) ? "N" : Model.ClubName.Substring(0, 1).ToUpper())
         </div>
-        <dl class="detail-grid">
-            <div class="detail-item span-2"><dt>Mô tả</dt><dd>@(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)</dd></div>
-            <div class="detail-item"><dt>Ngày thành lập</dt><dd>@Model.CreatedDate.ToString("dd/MM/yyyy")</dd></div>
-        </dl>
-        <div class="form-actions">
-            <a asp-action="Edit" asp-route-id="@Model.ClubId" class="btn btn-warning">Sửa thông tin</a>
-            <a asp-action="Delete" asp-route-id="@Model.ClubId" class="btn btn-danger">Xóa</a>
-            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        <div>
+            <h2 class="h3 fw-bold mb-0">@Model.ClubName</h2>
         </div>
+    </div>
+
+    <hr class="my-4 text-black-50" />
+
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="text-uppercase small fw-bold text-secondary mb-1">Mô tả</div>
+            <div class="fs-6 text-dark">
+                @(string.IsNullOrWhiteSpace(Model.Description) ? "Chưa có mô tả." : Model.Description)
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="text-uppercase small fw-bold text-secondary mb-1">Ngày thành lập</div>
+            <div class="fs-6 text-dark fw-semibold">
+                @Model.CreatedDate.ToString("dd/MM/yyyy")
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 pt-3">
+        <a asp-action="Edit" asp-route-id="@Model.ClubId" class="btn btn-warning px-4 fw-semibold">Sửa thông tin</a>
+        <a asp-action="Delete" asp-route-id="@Model.ClubId" class="btn btn-outline-danger px-4">Xóa</a>
+        <a asp-action="Index" class="btn btn-light px-4">Quay lại danh sách</a>
     </div>
 </div>

@@ -14,13 +14,13 @@
 
     <div class="mb-4">
         <a asp-controller="Account"
-   asp-action="Dashboard"
-   class="btn btn-outline-secondary">
-     Quay lại quản trị
-</a>
+           asp-action="Dashboard"
+           class="btn btn-outline-secondary mb-3">
+            ← Quay lại quản trị
+        </a>
 
         <div>
-            <h1>Danh Sách Đăng Ký Tham Gia CLB</h1>
+            <h1>Danh Sách Đăng Ký Tham Gia Nhóm</h1>
             <p class="text-muted mb-0">
                 Tra cứu và xử lý đơn đăng ký thành viên.
             </p>
@@ -132,12 +132,27 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Kết quả đăng ký</h5>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="mb-0">Kết quả đăng ký</h5>
+            <span class="badge bg-primary">
+                @Model.Count() đơn đăng ký
+            </span>
+        </div>
 
-        <span class="badge bg-primary">
-            @Model.Count() đơn đăng ký
-        </span>
+        @if (Model.Any())
+        {
+            <form asp-controller="MemberRegistration"
+                  asp-action="DeleteAll"
+                  method="post"
+                  class="d-inline"
+                  onsubmit="return confirm('CẢNH BÁO: Bạn có chắc chắn muốn XÓA TOÀN BỘ @Model.Count() đơn đăng ký không? Hành động này không thể hoàn tác!');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger btn-sm fw-semibold">
+                    Xóa toàn bộ
+                </button>
+            </form>
+        }
     </div>
 
     <div class="table-responsive">
@@ -150,6 +165,7 @@
                     <th>Lớp</th>
                     <th>SĐT</th>
                     <th>Email</th>
+                    <th>Nhóm đăng ký</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
                 </tr>
@@ -166,6 +182,11 @@
                             <td>@item.ClassName</td>
                             <td>@item.Phone</td>
                             <td>@item.Email</td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    @(item.Club?.ClubName ?? "Chưa chọn nhóm")
+                                </span>
+                            </td>
 
                             <td>
                                 @if (item.Status == "Pending")
@@ -193,44 +214,44 @@
                             </td>
 
                             <td>
-                                @if (item.Status == "Pending")
-                                {
+                                <div class="d-flex align-items-center gap-1 flex-wrap">
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <form asp-controller="MemberRegistration"
+                                              asp-action="Approve"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.RegistrationId" />
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                Đồng ý
+                                            </button>
+                                        </form>
+
+                                        <form asp-controller="MemberRegistration"
+                                              asp-action="Reject"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.RegistrationId" />
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                Từ chối
+                                            </button>
+                                        </form>
+                                    }
+
                                     <form asp-controller="MemberRegistration"
-                                          asp-action="Approve"
+                                          asp-action="Delete"
                                           method="post"
-                                          class="d-inline">
+                                          class="d-inline"
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa đơn đăng ký của @item.FullName không?');">
                                         @Html.AntiForgeryToken()
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@item.RegistrationId" />
-
-                                        <button type="submit"
-                                                class="btn btn-success btn-sm">
-                                            Đồng ý
+                                        <input type="hidden" name="id" value="@item.RegistrationId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            Xóa
                                         </button>
                                     </form>
-
-                                    <form asp-controller="MemberRegistration"
-                                          asp-action="Reject"
-                                          method="post"
-                                          class="d-inline">
-                                        @Html.AntiForgeryToken()
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@item.RegistrationId" />
-
-                                        <button type="submit"
-                                                class="btn btn-danger btn-sm">
-                                            Từ chối
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <span>Đã xử lý</span>
-                                }
+                                </div>
                             </td>
                         </tr>
                     }
@@ -238,7 +259,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="7" class="text-center py-4">
+                        <td colspan="8" class="text-center py-4">
                             <p class="fw-bold mb-1">
                                 Không tìm thấy đơn đăng ký
                             </p>
@@ -253,5 +274,4 @@
 
         </table>
     </div>
-
 </div>

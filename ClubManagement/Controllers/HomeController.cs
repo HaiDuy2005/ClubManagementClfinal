@@ -24,13 +24,11 @@ namespace ClubManagement.Controllers
             return View();
         }
 
-
         public async Task<IActionResult> Activities(
             string? searchName,
             string? searchLocation,
             DateTime? searchDate)
         {
-
             var query = _context.Activities.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchName))
@@ -65,6 +63,22 @@ namespace ClubManagement.Controllers
             ViewBag.SearchDate = searchDate?.ToString("yyyy-MM-dd");
 
             return View(activities);
+        }
+
+        // GET: /Home/ActivityDetails/5
+        public async Task<IActionResult> ActivityDetails(int id)
+        {
+            var activity = await _context.Activities
+                .Include(a => a.Club)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.ActivityId == id);
+
+            if (activity == null)
+            {
+                return NotFound("Không tìm thấy hoạt động yêu cầu.");
+            }
+
+            return View(activity);
         }
 
         public IActionResult Privacy()
