@@ -1,8 +1,9 @@
 @model ClubManagement.Models.MemberRegistration
 
 @{
-    ViewData["Title"] = "Đăng Ký Tham Gia CLB";
+    ViewData["Title"] = "Đăng Ký Tham Gia Nhóm";
 }
+
 <div class="back-navigation">
     <button type="button" class="btn-back" onclick="goBack()">
         <span aria-hidden="true">←</span>
@@ -24,7 +25,7 @@
 <div class="container mt-4 mb-5">
     <div class="card shadow-lg border-0 p-4">
         <h1 class="text-center text-primary mb-4">
-            Đăng Ký Tham Gia CLB Văn Nghệ
+            Đăng Ký Tham Gia Nhóm
         </h1>
 
         @if (TempData["Success"] != null)
@@ -41,7 +42,7 @@
             </div>
         }
 
-        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <form asp-controller="MemberRegistration"
               asp-action="Create"
@@ -94,7 +95,7 @@
                           class="text-danger"></span>
                 </div>
 
-                <div class="col-md-12 mb-3">
+                <div class="col-md-6 mb-3">
                     <label asp-for="Email" class="form-label">
                         Email
                     </label>
@@ -106,14 +107,27 @@
                           class="text-danger"></span>
                 </div>
 
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ClubId" class="form-label">
+                        Nhóm muốn tham gia
+                    </label>
+                    <select asp-for="ClubId"
+                            asp-items="ViewBag.Clubs"
+                            class="form-select">
+                        <option value="">-- Chọn nhóm --</option>
+                    </select>
+                    <span asp-validation-for="ClubId"
+                          class="text-danger"></span>
+                </div>
+
                 <div class="col-md-12 mb-3">
                     <label asp-for="Reason" class="form-label">
-                        Lý do tham gia CLB
+                        Lý do tham gia nhóm
                     </label>
                     <textarea asp-for="Reason"
                               rows="5"
                               class="form-control"
-                              placeholder="Nhập lý do bạn muốn tham gia CLB"></textarea>
+                              placeholder="Nhập lý do bạn muốn tham gia nhóm"></textarea>
                     <span asp-validation-for="Reason"
                           class="text-danger"></span>
                 </div>

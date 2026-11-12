@@ -1,31 +1,53 @@
 @model ClubManagement.Models.Club
 
 @{
-    ViewData["Title"] = "Xóa câu lạc bộ";
+    ViewData["Title"] = "Xóa nhóm - " + Model.ClubName;
 }
 
-<div class="record-page">
-    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
-    <header class="record-head">
-        <h1>Xóa câu lạc bộ</h1>
-        <p class="text-muted">Hành động này không thể hoàn tác.</p>
-    </header>
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        ← Quay lại danh sách
+    </a>
+</div>
 
-    <div class="record-card danger-card">
-        <div class="danger-note"><span class="danger-mark" aria-hidden="true">!</span><p>Bạn có chắc chắn muốn xóa câu lạc bộ <strong>@Model?.ClubName</strong> không?</p></div>
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-        @if (Model != null)
-        {
-            <dl class="detail-grid">
-                <div class="detail-item"><dt>Tên câu lạc bộ</dt><dd>@Model.ClubName</dd></div>
-                <div class="detail-item"><dt>Ngày thành lập</dt><dd>@Model.CreatedDate.ToString("dd/MM/yyyy")</dd></div>
-                <div class="detail-item span-2"><dt>Mô tả</dt><dd>@(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)</dd></div>
-            </dl>
-            <form asp-action="Delete" asp-route-id="@Model.ClubId" method="post" class="form-actions">
-                <input type="hidden" name="id" value="@Model.ClubId" />
-                <button type="submit" class="btn btn-danger btn-solid">Xác nhận xóa</button>
-                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-            </form>
-        }
+<div class="mb-4">
+    <h1 class="fw-bold mb-1">Xóa nhóm</h1>
+    <p class="text-secondary mb-0">Hành động này không thể hoàn tác.</p>
+</div>
+
+<div class="content-card p-4 p-md-5">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+    <div class="alert alert-danger p-3 mb-4 rounded-3 d-flex align-items-center gap-3">
+        <span class="fs-4">⚠️</span>
+        <div>
+            <strong>Lưu ý quản trị:</strong> Bạn có chắc chắn muốn xóa <strong>@Model.ClubName</strong>?
+            Hệ thống sẽ tự động dọn dẹp toàn bộ thành viên và các hoạt động liên quan đến nhóm này.
+        </div>
     </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="text-uppercase small fw-bold text-secondary mb-1">Tên nhóm</div>
+            <div class="fs-6 text-dark fw-semibold">@Model.ClubName</div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="text-uppercase small fw-bold text-secondary mb-1">Ngày thành lập</div>
+            <div class="fs-6 text-dark">@Model.CreatedDate.ToString("dd/MM/yyyy")</div>
+        </div>
+
+        <div class="col-12">
+            <div class="text-uppercase small fw-bold text-secondary mb-1">Mô tả</div>
+            <div class="fs-6 text-dark">
+                @(string.IsNullOrWhiteSpace(Model.Description) ? "Chưa có mô tả" : Model.Description)
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="d-flex gap-2 pt-3">
+        <input type="hidden" asp-for="ClubId" />
+        <button type="submit" class="btn btn-danger px-4 fw-semibold">Xác nhận xóa</button>
+        <a asp-action="Index" class="btn btn-light px-4">Hủy</a>
+    </form>
 </div>

@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ClubManagement.Models;
@@ -14,7 +13,7 @@ public class ClubsController : Controller
     }
 
     // GET: CLUBS
-    public async Task<IActionResult> Index()    
+    public async Task<IActionResult> Index()
     {
         return View(await _context.Clubs.ToListAsync());
     }
@@ -44,8 +43,6 @@ public class ClubsController : Controller
     }
 
     // POST: CLUBS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("ClubId,ClubName,Description,CreatedDate")] Club club)
@@ -76,8 +73,6 @@ public class ClubsController : Controller
     }
 
     // POST: CLUBS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int? id, [Bind("ClubId,ClubName,Description,CreatedDate")] Club club)
@@ -128,30 +123,44 @@ public class ClubsController : Controller
         return View(club);
     }
 
-    // POST: CLUBS/Delete/5
+    // POST: CLUBS/Delete/5 (XÓA DÂY CHUYỀN TỰ ĐỘNG)
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? id)
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var club = await _context.Clubs.FindAsync(id);
-        if (club == null)
-        {
-            return RedirectToAction(nameof(Index));
-        }
+        var club = await _context.Clubs
+            .Include(c => c.Members)
+            .Include(c => c.Activities)
+            .FirstOrDefaultAsync(m => m.ClubId == id);
 
-        try
+        if (club != null)
         {
+            // 1. Tự động xóa tất cả hoạt động, đăng ký và điểm danh của nhóm
+            if (club.Activities != null && club.Activities.Any())
+            {
+                foreach (var activity in club.Activities.ToList())
+                {
+                    var registrations = _context.ActivityRegistrations
+                        .Where(r => r.ActivityId == activity.ActivityId);
+                    _context.ActivityRegistrations.RemoveRange(registrations);
+
+                    var attendances = _context.ActivityAttendances
+                        .Where(a => a.ActivityId == activity.ActivityId);
+                    _context.ActivityAttendances.RemoveRange(attendances);
+
+                    _context.Activities.Remove(activity);
+                }
+            }
+
+            // 2. Tự động xóa tất cả thành viên thuộc nhóm
+            if (club.Members != null && club.Members.Any())
+            {
+                _context.Members.RemoveRange(club.Members);
+            }
+
+            // 3. Xóa chính nhóm này
             _context.Clubs.Remove(club);
             await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            // CLB còn thành viên hoặc hoạt động liên quan nên chưa thể xóa.
-            ModelState.AddModelError(string.Empty,
-                "Không thể xóa câu lạc bộ này vì vẫn còn thành viên hoặc hoạt động thuộc câu lạc bộ. Hãy xóa hoặc chuyển các mục đó trước.");
-            _context.ChangeTracker.Clear();
-            var again = await _context.Clubs.FirstOrDefaultAsync(m => m.ClubId == id);
-            return View(again);
         }
 
         return RedirectToAction(nameof(Index));

@@ -18,19 +18,19 @@ namespace ClubManagement.Controllers
             _context = context;
         }
 
-
         public async Task<IActionResult> Index(
             string? searchName,
             string? searchStudentCode,
             string? searchClass,
             string? searchEmail,
             string? searchPhone,
-            string? searchPosition)
+            string? searchPosition,
+            int? searchClubId)
         {
             var query = _context.Members
+                .Include(m => m.Club)
                 .AsNoTracking()
                 .AsQueryable();
-
 
             if (!string.IsNullOrWhiteSpace(searchName))
             {
@@ -38,13 +38,11 @@ namespace ClubManagement.Controllers
                     m.FullName.Contains(searchName));
             }
 
-
             if (!string.IsNullOrWhiteSpace(searchStudentCode))
             {
                 query = query.Where(m =>
                     m.StudentCode.Contains(searchStudentCode));
             }
-
 
             if (!string.IsNullOrWhiteSpace(searchClass))
             {
@@ -52,13 +50,11 @@ namespace ClubManagement.Controllers
                     m.ClassName.Contains(searchClass));
             }
 
-
             if (!string.IsNullOrWhiteSpace(searchEmail))
             {
                 query = query.Where(m =>
                     m.Email.Contains(searchEmail));
             }
-
 
             if (!string.IsNullOrWhiteSpace(searchPhone))
             {
@@ -66,17 +62,21 @@ namespace ClubManagement.Controllers
                     m.Phone.Contains(searchPhone));
             }
 
-
             if (!string.IsNullOrWhiteSpace(searchPosition))
             {
                 query = query.Where(m =>
                     m.Position.Contains(searchPosition));
             }
 
+            if (searchClubId.HasValue && searchClubId.Value > 0)
+            {
+                query = query.Where(m =>
+                    m.ClubId == searchClubId.Value);
+            }
+
             var members = await query
                 .OrderBy(m => m.FullName)
                 .ToListAsync();
-
 
             ViewBag.SearchName = searchName;
             ViewBag.SearchStudentCode = searchStudentCode;
@@ -84,10 +84,12 @@ namespace ClubManagement.Controllers
             ViewBag.SearchEmail = searchEmail;
             ViewBag.SearchPhone = searchPhone;
             ViewBag.SearchPosition = searchPosition;
+            ViewBag.SearchClubId = searchClubId;
+
+            await LoadClubsAsync(searchClubId);
 
             return View(members);
         }
-
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -95,6 +97,7 @@ namespace ClubManagement.Controllers
                 return NotFound();
 
             var member = await _context.Members
+                .Include(m => m.Club)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
             if (member == null)
@@ -103,13 +106,11 @@ namespace ClubManagement.Controllers
             return View(member);
         }
 
-
         public async Task<IActionResult> Create()
         {
             await LoadClubsAsync(null);
             return View(new Member());
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -129,7 +130,6 @@ namespace ClubManagement.Controllers
             return View(member);
         }
 
-
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -143,7 +143,6 @@ namespace ClubManagement.Controllers
             await LoadClubsAsync(member.ClubId);
             return View(member);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -177,13 +176,13 @@ namespace ClubManagement.Controllers
             return View(member);
         }
 
-
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
                 return NotFound();
 
             var member = await _context.Members
+                .Include(m => m.Club)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
             if (member == null)
@@ -191,7 +190,6 @@ namespace ClubManagement.Controllers
 
             return View(member);
         }
-
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -213,6 +211,7 @@ namespace ClubManagement.Controllers
                     "Không thể xóa thành viên này vì vẫn còn dữ liệu điểm danh liên quan.");
                 _context.ChangeTracker.Clear();
                 var again = await _context.Members
+                    .Include(m => m.Club)
                     .FirstOrDefaultAsync(m => m.MemberId == id);
                 return View(again);
             }

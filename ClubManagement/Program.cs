@@ -1,4 +1,3 @@
-
 using ClubManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Minio;
@@ -58,14 +57,32 @@ builder.Services.AddControllersWithViews(options =>
     messages.SetValueIsInvalidAccessor(value => $"Giá trị '{value}' không hợp lệ.");
     messages.SetValueMustBeANumberAccessor(field => $"{field} phải là một số.");
 });
+
 builder.Services.AddSingleton<
     Microsoft.AspNetCore.Mvc.DataAnnotations.IValidationAttributeAdapterProvider,
     ClubManagement.Infrastructure.VietnameseValidationAttributeAdapterProvider>();
-builder.Services.AddSession();
 
+builder.Services.AddSession();
 builder.Services.AddScoped<ClubManagement.Services.MinioStorageService>();
 
 var app = builder.Build();
+
+// Tu dong bo sung cot ClubId vao bang MemberRegistrations neu chua co
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        db.Database.ExecuteSqlRaw("ALTER TABLE `MemberRegistrations` ADD COLUMN `ClubId` INT NULL;");
+    }
+    catch { }
+
+    try
+    {
+        db.Database.ExecuteSqlRaw("ALTER TABLE `MemberRegistrations` ADD CONSTRAINT `FK_MemberRegistrations_Clubs_ClubId` FOREIGN KEY (`ClubId`) REFERENCES `Clubs`(`ClubId`) ON DELETE SET NULL;");
+    }
+    catch { }
+}
 
 // Cau hinh middleware
 if (!app.Environment.IsDevelopment())

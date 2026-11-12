@@ -1,0 +1,91 @@
+﻿@model ClubManagement.Models.ClubActivity
+
+@{
+    ViewData["Title"] = "Chi tiết hoạt động - " + Model.ActivityName;
+}
+
+<div class="back-navigation">
+    <button type="button" class="btn-back" onclick="goBack()">
+        <span aria-hidden="true">←</span>
+        Quay lại
+    </button>
+</div>
+
+<div class="mb-4">
+    <p class="text-uppercase small fw-bold mb-1" style="color:var(--brand);letter-spacing:.12em">
+        Thông tin chi tiết
+    </p>
+    <h1 class="page-title">@Model.ActivityName</h1>
+</div>
+
+<div class="content-card p-4 p-md-5">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <span class="badge bg-primary-subtle text-primary fs-6 px-3 py-2 rounded-pill mb-2">
+                @(Model.Club?.ClubName ?? "CLB Văn Nghệ")
+            </span>
+            <h2 class="h3 fw-bold mb-0">@Model.ActivityName</h2>
+        </div>
+        <a asp-controller="ActivityRegistration"
+           asp-action="Create"
+           asp-route-id="@Model.ActivityId"
+           class="btn btn-primary btn-lg px-4">
+            Đăng ký tham gia ngay
+        </a>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="p-3 rounded-3 bg-light">
+                <div class="text-secondary small fw-bold text-uppercase">📍 Địa điểm</div>
+                <div class="fs-6 fw-semibold text-dark mt-1">
+                    @(string.IsNullOrWhiteSpace(Model.Location) ? "Chưa cập nhật" : Model.Location)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-3 rounded-3 bg-light">
+                <div class="text-secondary small fw-bold text-uppercase">📅 Ngày tổ chức</div>
+                <div class="fs-6 fw-semibold text-dark mt-1">
+                    @Model.ActivityDate.ToString("dd/MM/yyyy")
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-3 rounded-3 bg-light">
+                <div class="text-secondary small fw-bold text-uppercase">🏆 Quyền lợi điểm danh</div>
+                <div class="fs-6 fw-semibold text-success mt-1">
+                    +1 Điểm rèn luyện
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h3 class="h5 fw-bold mb-3">Mô tả chi tiết hoạt động</h3>
+        <div class="text-secondary lh-lg fs-6">
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                @Html.Raw(Model.Description.Replace("\n", "<br />"))
+            }
+            else
+            {
+                <p class="fst-italic text-muted mb-0">Chưa có nội dung mô tả chi tiết cho hoạt động này.</p>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function goBack() {
+        if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
+            window.history.back();
+        } else {
+            window.location.href = '@Url.Action("Activities", "Home")';
+        }
+    }
+</script>

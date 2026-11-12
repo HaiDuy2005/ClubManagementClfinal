@@ -4,19 +4,15 @@
     ViewData["Title"] = "Hoạt động";
 }
 
-
 <div class="back-navigation">
-    <button type="button" class="btn-back"
-            onclick="goBack()">
+    <button type="button" class="btn-back" onclick="goBack()">
         <span aria-hidden="true">←</span>
         Quay lại
     </button>
 </div>
 
-
 <div class="mb-4">
-    <p class="text-uppercase small fw-bold mb-1"
-       style="color:var(--brand);letter-spacing:.12em">
+    <p class="text-uppercase small fw-bold mb-1" style="color:var(--brand);letter-spacing:.12em">
         Lịch câu lạc bộ
     </p>
 
@@ -26,7 +22,6 @@
         Khám phá chương trình sắp diễn ra và đăng ký tham gia cùng các thành viên.
     </p>
 </div>
-
 
 <div class="content-card activity-search-card mb-4">
     <div class="activity-search-heading">
@@ -94,7 +89,6 @@
     </form>
 </div>
 
-
 <div class="content-card p-3 p-md-4">
     <div class="activity-list-heading">
         <div>
@@ -137,12 +131,21 @@
                             </td>
 
                             <td class="text-end">
-                                <a asp-controller="ActivityRegistration"
-                                   asp-action="Create"
-                                   asp-route-id="@item.ActivityId"
-                                   class="btn btn-sm btn-primary">
-                                    Đăng ký tham gia
-                                </a>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-controller="Home"
+                                       asp-action="ActivityDetails"
+                                       asp-route-id="@item.ActivityId"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        Chi tiết
+                                    </a>
+
+                                    <a asp-controller="ActivityRegistration"
+                                       asp-action="Create"
+                                       asp-route-id="@item.ActivityId"
+                                       class="btn btn-sm btn-primary">
+                                        Đăng ký tham gia
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     }
