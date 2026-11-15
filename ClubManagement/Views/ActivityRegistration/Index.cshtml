@@ -1,4 +1,3 @@
-
 @model IEnumerable<ClubManagement.Models.ActivityRegistration>
 
 @{
@@ -84,18 +83,13 @@
             <div class="col-md-3">
                 <label class="form-label">Trạng thái</label>
                 <select name="searchStatus" class="form-select">
-                    <option value="All"
-                            selected="@(searchStatus == "All")">
+                    <option value="All" selected="@(searchStatus == "All")">
                         Tất cả
                     </option>
-
-                    <option value="Pending"
-                            selected="@(searchStatus == "Pending")">
+                    <option value="Pending" selected="@(searchStatus == "Pending")">
                         Chờ duyệt
                     </option>
-
-                    <option value="Approved"
-                            selected="@(searchStatus == "Approved")">
+                    <option value="Approved" selected="@(searchStatus == "Approved")">
                         Đã duyệt
                     </option>
                 </select>
@@ -131,7 +125,9 @@
             <thead class="table-dark">
                 <tr>
                     <th>Họ tên</th>
+                    <th>MSSV - Lớp</th>
                     <th>Email</th>
+                    <th>Nhóm / Đối tượng</th>
                     <th>Hoạt động</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
@@ -145,7 +141,24 @@
                     {
                         <tr>
                             <td>@item.FullName</td>
+                            <td>@item.StudentCode - @item.ClassName</td>
                             <td>@item.Email</td>
+
+                            <td>
+                                @if (item.Club != null)
+                                {
+                                    <span class="badge bg-info text-dark">
+                                        @item.Club.ClubName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Không thuộc CLB
+                                    </span>
+                                }
+                            </td>
+
                             <td>@item.ActivityName</td>
 
                             <td>
@@ -208,11 +221,10 @@
                 else
                 {
                     <tr>
-                        <td colspan="5" class="text-center py-4">
+                        <td colspan="7" class="text-center py-4">
                             <p class="fw-bold mb-1">
                                 Không tìm thấy đăng ký
                             </p>
-
                             <span class="text-muted">
                                 Hãy thử thay đổi điều kiện tìm kiếm.
                             </span>
@@ -223,5 +235,4 @@
 
         </table>
     </div>
-
 </div>

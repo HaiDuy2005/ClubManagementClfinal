@@ -123,6 +123,24 @@ namespace ClubManagement.Controllers
                 ModelState.AddModelError(nameof(model.ClassName), "Vui lòng nhập lớp.");
             }
 
+            // Kiểm tra sinh viên có thuộc nhóm nào của câu lạc bộ không
+            if (!string.IsNullOrWhiteSpace(model.FullName) &&
+                !string.IsNullOrWhiteSpace(model.StudentCode) &&
+                !string.IsNullOrWhiteSpace(model.ClassName))
+            {
+                bool isClubMember = await _context.Clubs
+                    .AnyAsync(c => c.Members.Any(m =>
+                        m.FullName.Trim() == model.FullName &&
+                        m.StudentCode.Trim() == model.StudentCode &&
+                        m.ClassName.Trim() == model.ClassName));
+
+                if (!isClubMember)
+                {
+                    ModelState.AddModelError(string.Empty,
+                        "Không phải là thành viên của câu lạc bộ, không thể điểm danh.");
+                }
+            }
+
             if (evidenceFile == null || evidenceFile.Length == 0)
             {
                 ModelState.AddModelError("evidenceFile", "Vui lòng chọn ảnh minh chứng.");

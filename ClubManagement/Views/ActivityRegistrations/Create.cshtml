@@ -1,48 +1,95 @@
 @model ClubManagement.Models.ActivityRegistration
+@using ClubManagement.Models
+
+@{
+    var clubs = ViewBag.Clubs as IEnumerable<Club> ?? Enumerable.Empty<Club>();
+}
 
 <h2>Đăng Ký Tham Gia Hoạt Động</h2>
 
-<form asp-action="Create">
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
 
- <input asp-for="ActivityId" hidden />
- <input asp-for="ActivityName" hidden />
- <input asp-for="ActivityDate" hidden />
+    <input asp-for="ActivityId" hidden />
+    <input asp-for="ActivityName" hidden />
+    <input asp-for="ActivityDate" hidden />
 
- <div class="mb-3">
- <label>Họ Tên</label>
- <input asp-for="FullName" class="form-control" />
- </div>
+    <div class="mb-3">
+        <label>Họ Tên</label>
+        <input asp-for="FullName" class="form-control" required />
+    </div>
 
- <div class="mb-3">
- <label>Lớp</label>
- <input asp-for="ClassName" class="form-control" />
- </div>
+    <div class="mb-3">
+        <label>Lớp</label>
+        <input asp-for="ClassName" class="form-control" required />
+    </div>
 
- <div class="mb-3">
- <label>MSSV</label>
- <input asp-for="StudentCode" class="form-control" />
- </div>
+    <div class="mb-3">
+        <label>MSSV</label>
+        <input asp-for="StudentCode" class="form-control" required />
+    </div>
 
- <div class="mb-3">
- <label>Email</label>
- <input asp-for="Email" class="form-control" />
- </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <input asp-for="Email" type="email" class="form-control" required />
+    </div>
 
- <div class="mb-3">
- <label>Hoạt Động</label>
- <input asp-for="ActivityName"
- class="form-control"
- readonly />
- </div>
+    <div class="mb-3">
+        <label>Hoạt Động</label>
+        <input asp-for="ActivityName" class="form-control" readonly />
+    </div>
 
- <div class="mb-3">
- <label>Ngày Tổ Chức</label>
- <input asp-for="ActivityDate"
- class="form-control"
- readonly />
- </div>
+    <div class="mb-3">
+        <label>Ngày Tổ Chức</label>
+        <input asp-for="ActivityDate" class="form-control" readonly />
+    </div>
 
- <button type="submit" class="btn btn-success">
- Gửi Đăng Ký
- </button>
+    <div class="mb-3">
+        <label>Nhóm thuộc CLB (nếu có)</label>
+        <select asp-for="ClubId" id="clubSelectPlural" class="form-select">
+            <option value="">-- Không thuộc CLB (Sinh viên ngoài CLB) --</option>
+            @foreach (var club in clubs)
+            {
+                <option value="@club.ClubId">@club.ClubName</option>
+            }
+        </select>
+        <span asp-validation-for="ClubId" class="text-danger small d-block mt-1"></span>
+
+        <div id="externalNoticePlural"
+             class="alert mt-2 py-2 px-3 small"
+             style="background-color: #2b2111; border: 1px solid #854d0e; color: #fde047;">
+            <strong>Thông báo:</strong> Bạn đang chọn <strong>Không thuộc CLB</strong>. Bạn vẫn được tham gia hoạt động nhưng <strong>sẽ không được cộng điểm rèn luyện</strong>.
+        </div>
+
+        <div id="memberNoticePlural"
+             class="alert mt-2 py-2 px-3 small d-none"
+             style="background-color: #0f291e; border: 1px solid #166534; color: #86efac;">
+            Hệ thống sẽ đối chiếu mã sinh viên của bạn với danh sách thành viên của nhóm đã chọn để cộng điểm rèn luyện sau khi được duyệt.
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Gửi Đăng Ký
+    </button>
 </form>
+
+<script>
+    (function () {
+        const clubSelect = document.getElementById('clubSelectPlural');
+        const externalNotice = document.getElementById('externalNoticePlural');
+        const memberNotice = document.getElementById('memberNoticePlural');
+
+        function updateNotice() {
+            if (!clubSelect.value) {
+                externalNotice.classList.remove('d-none');
+                memberNotice.classList.add('d-none');
+            } else {
+                externalNotice.classList.add('d-none');
+                memberNotice.classList.remove('d-none');
+            }
+        }
+
+        clubSelect.addEventListener('change', updateNotice);
+        updateNotice();
+    })();
+</script>

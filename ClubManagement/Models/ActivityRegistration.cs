@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -26,6 +25,12 @@ namespace ClubManagement.Models
         public string ActivityName { get; set; } = string.Empty;
 
         public DateTime ActivityDate { get; set; }
+
+        // Null = Không thuộc CLB; Có giá trị = Thuộc nhóm chuyên môn trong CLB
+        public int? ClubId { get; set; }
+
+        [ForeignKey(nameof(ClubId))]
+        public Club? Club { get; set; }
 
         public bool IsApproved { get; set; } = false;
     }
