@@ -42,10 +42,6 @@ namespace ClubManagement.Migrations
                     b.Property<DateTime>("AttendanceDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ClassName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("EvidenceFileName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

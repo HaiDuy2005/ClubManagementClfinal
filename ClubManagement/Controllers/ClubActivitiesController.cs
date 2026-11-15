@@ -192,19 +192,32 @@ namespace ClubManagement.Controllers
             if (activity == null)
                 return RedirectToAction(nameof(Index));
 
-            // 1. Xóa các đơn đăng ký thuộc về hoạt động này
-            var registrations = _context.ActivityRegistrations
-                .Where(r => r.ActivityId == id);
-            _context.ActivityRegistrations.RemoveRange(registrations);
+            try
+            {
+                // 1. Xóa các đơn đăng ký thuộc về hoạt động này
+                var registrations = _context.ActivityRegistrations
+                    .Where(r => r.ActivityId == id);
+                _context.ActivityRegistrations.RemoveRange(registrations);
 
-            // 2. Xóa dữ liệu điểm danh thuộc về hoạt động này
-            var attendances = _context.Set<Attendance>()
-                .Where(a => a.ActivityId == id);
-            _context.Set<Attendance>().RemoveRange(attendances);
+                // 2. Xóa dữ liệu điểm danh (cả bảng Attendance và ActivityAttendance)
+                var attendances = _context.Set<Attendance>()
+                    .Where(a => a.ActivityId == id);
+                _context.Set<Attendance>().RemoveRange(attendances);
 
-            // 3. Xóa hoạt động (Không làm ảnh hưởng Nhóm hay Thành viên)
-            _context.Activities.Remove(activity);
-            await _context.SaveChangesAsync();
+                var activityAttendances = _context.Set<ActivityAttendance>()
+                    .Where(a => a.ActivityId == id);
+                _context.Set<ActivityAttendance>().RemoveRange(activityAttendances);
+
+                // 3. Xóa hoạt động (Không làm ảnh hưởng Nhóm hay Thành viên)
+                _context.Activities.Remove(activity);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Đã xóa hoạt động thành công.";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["Error"] = "Không thể xóa hoạt động này do vẫn còn dữ liệu liên kết trong hệ thống.";
+            }
 
             return RedirectToAction(nameof(Index));
         }

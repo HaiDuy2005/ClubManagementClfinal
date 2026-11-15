@@ -1,4 +1,3 @@
-
 @model IEnumerable<ClubManagement.Models.Contact>
 
 @{
@@ -129,7 +128,7 @@
                     <th>Email</th>
                     <th>Nội dung</th>
                     <th>Ngày gửi</th>
-                    <th class="text-center" style="width: 120px;">Thao tác</th>
+                    <th class="text-center" style="width: 165px;">Thao tác</th>
                 </tr>
             </thead>
 
@@ -138,6 +137,19 @@
                 {
                     foreach (var item in Model)
                     {
+                        var senderName = item.Name?.Trim() ?? "";
+                        var greeting = (string.IsNullOrWhiteSpace(senderName) || senderName.Equals("Ẩn Danh", StringComparison.OrdinalIgnoreCase))
+                            ? "bạn"
+                            : senderName;
+                        var subject = Uri.EscapeDataString("Phản hồi liên hệ - CLB Văn Nghệ");
+                        var body = Uri.EscapeDataString(
+                            $"Chào {greeting},\n\n" +
+                            $"Cảm ơn bạn đã gửi liên hệ đến CLB Văn Nghệ. Về nội dung bạn đã trao đổi:\n" +
+                            $"\"{item.Message}\"\n\n" +
+                            $"CLB xin phản hồi như sau:\n"
+                        );
+                        var gmailUrl = $"https://mail.google.com/mail/?view=cm&fs=1&to={Uri.EscapeDataString(item.Email ?? "")}&su={subject}&body={body}";
+
                         <tr>
                             <td>@item.Name</td>
                             <td>@item.Email</td>
@@ -151,20 +163,30 @@
                             </td>
 
                             <td class="text-center">
-                                <form asp-controller="Contact"
-                                      asp-action="Delete"
-                                      asp-route-id="@item.ContactId"
-                                      method="post"
-                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa liên hệ của @item.Name không?');">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="@gmailUrl"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-primary btn-sm">
+                                        Trả lời
+                                    </a>
 
-                                    @Html.AntiForgeryToken()
+                                    <form asp-controller="Contact"
+                                          asp-action="Delete"
+                                          asp-route-id="@item.ContactId"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa liên hệ của @item.Name không?');">
 
-                                    <button type="submit"
-                                            class="btn btn-danger btn-sm">
-                                        Xóa
-                                    </button>
+                                        @Html.AntiForgeryToken()
 
-                                </form>
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm">
+                                            Xóa
+                                        </button>
+
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }

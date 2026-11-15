@@ -1,4 +1,4 @@
-services:
+﻿services:
   mysql:
     image: mysql:8.4
     container_name: clubmanagement-mysql
@@ -23,8 +23,50 @@ services:
       retries: 10
       start_period: 30s
 
+  minio:
+    image: cgr.dev/chainguard/minio:latest-dev
+    container_name: clubmanagement-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:9002:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - clubmanagement-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clubmanagement-web
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-ClubManagementDB};User=${MYSQL_USER:-clubapp};Password=${MYSQL_PASSWORD};
+      MinIO__Endpoint: minio:9000
+      MinIO__AccessKey: ${MINIO_ROOT_USER}
+      MinIO__SecretKey: ${MINIO_ROOT_PASSWORD}
+      MinIO__BucketName: ${MINIO_BUCKET_NAME:-clubmanagement}
+      MinIO__UseSSL: "false"
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks:
+      - clubmanagement-network
+
 volumes:
   mysql_data:
+  minio_data:
 
 networks:
   clubmanagement-network:
